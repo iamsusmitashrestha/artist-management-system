@@ -10,12 +10,16 @@ export const connection = mysql.createConnection({
     database: process.env.DB_NAME
 });
 
-connection.connect(err => {
-    if (err) {
-        console.error('Database connection failed', err);
-        process.exit(1);
-    }
+const migrationSQL = fs.readFileSync('./db/makeMigration.sql', 'utf8');
 
-    console.log('Connected to the database');
+// Execute the migration
+connection.query(migrationSQL, (err, results) => {
+    if (err) {
+        console.error('❌ Migration failed:', err);
+        process.exit(1);
+    } else {
+        console.log('✅ Migration completed successfully');
+    }
+    connection.end();
 });
 
