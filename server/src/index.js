@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { StatusCodes, getReasonPhrase } from 'http-status-codes';
 
 import  logger from './utils/logger.js';
+import { handleRoutes } from './router.js';
 
 dotenv.config(); 
 
@@ -11,14 +12,18 @@ const HOST = process.env.APP_HOST || 'localhost';
 
 // Create HTTP server
 const server = http.createServer((req, res) => {
-  res.statusCode = StatusCodes.OK; 
-  res.setHeader('Content-Type', 'text/plain');
-  res.end(`${getReasonPhrase(StatusCodes.OK)}\n`); 
+  try {
+    handleRoutes(req, res);
+} catch (err) {
+    logger.error(' Internal Server Error:', err);
+    res.writeHead(StatusCodes.INTERNAL_SERVER_ERROR, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Internal Server Error' }));
+} 
 });
 
 // Handle server errors
 server.on('error', (err) => {
-  logger.error('❌ Server error:', err);
+  logger.error(' Server error:', err);
 });
 
 // Start the server

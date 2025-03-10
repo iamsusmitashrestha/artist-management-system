@@ -3,10 +3,12 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 
+import logger from '../utils/logger.js';
+
 
 dotenv.config();
 
-const connection = mysql.createConnection({
+export const connection = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
@@ -19,7 +21,7 @@ const migrationFolder = path.join(process.cwd(), 'src/db/migrations');
 
 fs.readdir(migrationFolder, (err, files) => {
     if (err) {
-        console.error('❌ Failed to read migration files:', err);
+        logger.error('Failed to read migration files:', err);
         process.exit(1);
     }
 
@@ -34,11 +36,10 @@ fs.readdir(migrationFolder, (err, files) => {
 
     connection.query(sqlStatements, (err) => {
         if (err) {
-            console.error('❌ Migration failed:', err);
+            logger.error('Migration failed:', err);
             process.exit(1);
         } else {
-            console.log('✅ Migrations applied successfully');
+            logger.info('Migrations applied successfully');
         }
-        connection.end();
     });
 });

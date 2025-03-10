@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 
+import logger from '../utils/logger.js';
+
 dotenv.config();
 
 const connection = mysql.createConnection({
@@ -18,7 +20,7 @@ const migrationFolder = path.join(process.cwd(), 'src/db/migrations');
 
 fs.readdir(migrationFolder, (err, files) => {
     if (err) {
-        console.error('❌ Failed to read rollback files:', err);
+        logger.error('Failed to read rollback files:', err);
         process.exit(1);
     }
 
@@ -33,11 +35,10 @@ fs.readdir(migrationFolder, (err, files) => {
 
     connection.query(sqlStatements, (err) => {
         if (err) {
-            console.error('❌ Rollback failed:', err);
+            logger.error('Rollback failed:', err);
             process.exit(1);
         } else {
-            console.log('✅ Rollback completed successfully');
+            logger.info('Rollback completed successfully');
         }
-        connection.end();
     });
 });

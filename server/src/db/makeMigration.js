@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import logger from '../utils/logger.js';
 
 const migrationFolder = path.join(process.cwd(), 'src/db/migrations');
 
@@ -12,7 +13,7 @@ if (!fs.existsSync(migrationFolder)) {
 const migrationName = process.argv[2];
 
 if (!migrationName) {
-    console.error('❌ Please provide a migration name. Example: npm run make:migration create_users');
+    logger.error('Please provide a migration name. Example: npm run make:migration create_users');
     process.exit(1);
 }
 
@@ -30,4 +31,4 @@ const template = `-- Up: Create Table
 // Create the file
 fs.writeFileSync(filePath, template);
 
-console.log(`✅ Migration created: ${filePath}`);
+logger.info(`Migration created: ${filePath}`);
