@@ -1,6 +1,12 @@
 import bcrypt from "bcryptjs";
-import validator from "validator";
+import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 import { create, getUserByEmail } from "../models/user.js";
+import { validateLoginData, validateUserData } from "../utils/validator.js";
+
+dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET || "jwt_secret";
 
 /**
  * Registers a new user.
@@ -24,53 +30,23 @@ export async function createUser(userData) {
   return create({ ...userData, password: hashedPassword });
 }
 
-/**
- * Validates user input.
- * @param {Object} userData - User details.
- * @throws {Error} If validation fails.
- */
-function validateUserData(userData) {
-  const {
-    firstName,
-    lastName,
-    email,
-    password,
-    phone,
-    dob,
-    gender,
-    address,
-    role,
-  } = userData;
+export async function login(userData) {
+  const { password, email } = userData;
 
-  if (
-    !firstName ||
-    !lastName ||
-    !email ||
-    !password ||
-    !phone ||
-    !dob ||
-    !gender ||
-    !address ||
-    !role
-  ) {
-    throw new Error("All fields are required");
-  }
+  // Validate
+  validateLoginData(email, password);
 
-  if (!validator.isEmail(email)) {
-    throw new Error("Invalid email format");
-  }
+  const user = await getUserByEmail(email);
 
-  if (!validator.isStrongPassword(password, { minLength: 8, minNumbers: 1 })) {
-    throw new Error(
-      "Password must be at least 8 characters long and include a number"
-    );
-  }
+  // Compare password
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) throw new Error("Invalid email or password");
 
-  if (!validator.isMobilePhone(phone, "any", { strictMode: true })) {
-    throw new Error("Invalid phone number");
-  }
+  // Generate JWT
+  const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, {
+    expiresIn: "1h",
+  });
 
-  if (!["M", "F", "O"].includes(gender.toUpperCase())) {
-    throw new Error("Invalid gender value. Allowed: M, F, O");
-  }
+  return { message: "Login successful", token };
 }
+
