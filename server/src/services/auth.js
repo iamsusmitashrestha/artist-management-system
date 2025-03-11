@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import { create, getUserByEmail } from "../models/user.js";
-import { validateLoginData, validateUserData } from "../utils/validator.js";
+import { loginSchema, userSchema } from "../utils/userValidation.js";
 
 dotenv.config();
 
@@ -22,7 +22,8 @@ export async function createUser(userData) {
     throw Error(`User with email: ${email} already exists`);
   }
 
-  validateUserData(userData);
+  const { error } = userSchema.validate(userData);
+  if (error) throw new Error(error.details[0].message);
 
   // Hash password before saving
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -34,7 +35,9 @@ export async function login(userData) {
   const { password, email } = userData;
 
   // Validate
-  validateLoginData(email, password);
+  const { error } = loginSchema.validate(userData);
+  if (error) throw new Error(error.details[0].message);
+
 
   const user = await getUserByEmail(email);
 

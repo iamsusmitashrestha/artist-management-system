@@ -7,7 +7,7 @@ import { deleteUser, getAllUsers, updateUser } from "../controllers/user.js";
 
 export function handleUserRoutes(req, res) {
   verifyToken(req, res, () => {
-    if (req.method === METHOD.GET && req.url === "/users") {
+    if (req.method === METHOD.GET && req.url.startsWith("/users")) {
       requireRole([ROLES.SUPER_ADMIN])(req, res, async () => {
         await getAllUsers(req, res);
     });
@@ -19,7 +19,7 @@ export function handleUserRoutes(req, res) {
       requireRole([ROLES.SUPER_ADMIN])(req, res, async() => {
         const userId = req.url.split("/")[2];
 
-        await updateUser(req,res,userId)
+        await updateUser(req,res,userId);
       });
     } else if (req.method === METHOD.DELETE && req.url.startsWith("/users/")) {
       requireRole([ROLES.SUPER_ADMIN])(req, res, async() => {

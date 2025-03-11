@@ -10,3 +10,5 @@ export const ROLES={
     ARTIST_MANAGER : 'artist_manager',
     ARTIST : 'artist'
 }
+
+export const DEFAULT_PAGE_SIZE= 10;
