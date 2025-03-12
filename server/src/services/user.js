@@ -3,11 +3,9 @@ import { getMeta } from "../utils/pagination.js";
 import { updateUserSchema } from "../utils/userValidation.js";
 
 export async function getAllUsers(page, size) {
-  const offset = (page - 1) * size;
+  const { data, count } = await userModel.getAllUsers(page, size);
 
-  const { data, count } = await userModel.getAllUsers(size, offset);
-
-  const meta = getMeta(count, size);
+  const meta = getMeta(page, size, count);
 
   return { data, meta };
 }

@@ -45,17 +45,19 @@ export async function getUserByEmail(email) {
 /**
  * Get all users
  */
-export async function getAllUsers(size, offset) {
-  const query = `SELECT id, first_name, last_name, email, phone, dob, gender, address, role FROM user`;
+export async function getAllUsers(page, size) {
+  let query = `SELECT id, first_name, last_name, email, phone, dob, gender, address, role FROM user`;
 
   const countQuery = `SELECT COUNT(*) AS total FROM user`;
+
+  query = injectPaginationToQuery(query, page, size);
 
   return new Promise((resolve, reject) => {
     connection.query(countQuery, [], (err, countResults) => {
       if (err) return reject(err);
 
       const count = countResults[0].total;
-      connection.query(query, [size, offset], (err, results) => {
+      connection.query(query, [], (err, results) => {
         if (err) return reject(err);
         const data = results.map((user) => ({
           id: user.id,
@@ -67,9 +69,9 @@ export async function getAllUsers(size, offset) {
           gender: user.gender,
           address: user.address,
           role: user.role,
-      }));
-  
-      resolve({ data, count });
+        }));
+
+        resolve({ data, count });
       });
     });
   });
@@ -94,7 +96,7 @@ export async function getUserById(userId) {
         gender: user.gender,
         address: user.address,
         role: user.role,
-    }));
+      }));
       resolve(data[0]);
     });
   });

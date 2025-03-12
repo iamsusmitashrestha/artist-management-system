@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "joi": "^17.13.3"
+    "eslint": "^9.22.0"
   }
 }

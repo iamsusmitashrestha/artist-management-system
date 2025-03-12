@@ -28,5 +28,5 @@ server.on('error', (err) => {
 
 // Start the server
 server.listen(PORT, HOST, () => {
-  logger.info(`🚀 Server running at http://${HOST}:${PORT}/`);
+  logger.info(`Server running at http://${HOST}:${PORT}/`);
 });
