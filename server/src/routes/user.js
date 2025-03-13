@@ -10,22 +10,22 @@ export function handleUserRoutes(req, res) {
     if (req.method === METHOD.GET && req.url.startsWith("/users")) {
       requireRole([ROLES.SUPER_ADMIN])(req, res, async () => {
         await getAllUsers(req, res);
-    });
+      });
     } else if (req.method === METHOD.POST && req.url === "/users") {
       requireRole([ROLES.SUPER_ADMIN])(req, res, async () => {
         await registerUser(req, res);
-    });
+      });
     } else if (req.method === METHOD.PUT && req.url.startsWith("/users/")) {
-      requireRole([ROLES.SUPER_ADMIN])(req, res, async() => {
+      requireRole([ROLES.SUPER_ADMIN])(req, res, async () => {
         const userId = req.url.split("/")[2];
 
-        await updateUser(req,res,userId);
+        await updateUser(req, res, userId);
       });
     } else if (req.method === METHOD.DELETE && req.url.startsWith("/users/")) {
-      requireRole([ROLES.SUPER_ADMIN])(req, res, async() => {
+      requireRole([ROLES.SUPER_ADMIN])(req, res, async () => {
         const userId = req.url.split("/")[2];
 
-        await deleteUser(req,res,userId);
+        await deleteUser(req, res, userId);
       });
     } else {
       res.writeHead(StatusCodes.NOT_FOUND, {

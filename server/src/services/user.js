@@ -1,6 +1,6 @@
 import * as userModel from "../models/user.js";
 import { getMeta } from "../utils/pagination.js";
-import { updateUserSchema } from "../utils/userValidation.js";
+import { updateUserSchema } from "../schema/user.js";
 
 export async function getAllUsers(page, size) {
   const { data, count } = await userModel.getAllUsers(page, size);

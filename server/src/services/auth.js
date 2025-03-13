@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import { create, getUserByEmail } from "../models/user.js";
-import { loginSchema, userSchema } from "../utils/userValidation.js";
+import { loginSchema, userSchema } from "../schema/user.js";
 
 dotenv.config();
 
@@ -47,7 +47,7 @@ export async function login(userData) {
 
   // Generate JWT
   const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, {
-    expiresIn: "1h",
+    expiresIn: "12h",
   });
 
   return { message: "Login successful", token };
