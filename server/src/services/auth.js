@@ -38,7 +38,6 @@ export async function login(userData) {
   const { error } = loginSchema.validate(userData);
   if (error) throw new Error(error.details[0].message);
 
-
   const user = await getUserByEmail(email);
 
   // Compare password
@@ -50,6 +49,5 @@ export async function login(userData) {
     expiresIn: "12h",
   });
 
-  return { message: "Login successful", token };
+  return { message: "Login successful", token, role: user.role };
 }
-
