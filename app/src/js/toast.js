@@ -1,4 +1,4 @@
-export function showToast({ text, type }) {
+export function showToast(text, type) {
   Toastify({
     text,
     duration: 2000,

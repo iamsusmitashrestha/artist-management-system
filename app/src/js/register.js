@@ -1,6 +1,6 @@
-import { API_BASE_URL, RESPONSE_TYPE } from "../constants/common.js";
-import { clearError, showError } from "../utils/common.js";
 import { showToast } from "./toast.js";
+import { clearError, showError } from "../utils/common.js";
+import { API_BASE_URL, RESPONSE_TYPE } from "../constants/common.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("registerForm");
@@ -75,23 +75,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (response.status === statusCodes.CREATED) {
         showToast("Registration successful!", RESPONSE_TYPE.SUCCESS);
+        // navigateTo("/login");
         // form.reset();
       }
     } catch (error) {
       showToast("Something went wrong");
     }
   });
-
-  // Toggle password visibility
-  document
-    .getElementById("togglePassword")
-    .addEventListener("click", function () {
-      const passwordField = document.getElementById("password");
-      passwordField.type =
-        passwordField.type === "password" ? "text" : "password";
-      this.src =
-        passwordField.type === "password"
-          ? "https://cdn-icons-png.flaticon.com/512/159/159604.png"
-          : "https://cdn-icons-png.flaticon.com/512/565/565655.png";
-    });
 });
+
+// Toggle password visibility
+document
+  .getElementById("togglePassword")
+  .addEventListener("click", function () {
+    const passwordField = document.getElementById("password");
+    passwordField.type =
+      passwordField.type === "password" ? "text" : "password";
+    this.src =
+      passwordField.type === "password"
+        ? "https://cdn-icons-png.flaticon.com/512/159/159604.png"
+        : "https://cdn-icons-png.flaticon.com/512/565/565655.png";
+  });
