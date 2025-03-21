@@ -5,13 +5,7 @@
 }
 
 #logoutBtn {
-  padding: 12px;
-  background: #28a745;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
   font-size: 16px;
-  cursor: pointer;
 }
 
 .tabContainer {
@@ -35,6 +29,7 @@
   background-color: #f5f5f5;
   cursor: pointer;
   transition: background-color 0.3s;
+  color: black;
 }
 
 .tab:hover {
@@ -57,4 +52,28 @@
 
 .tabPanel.active {
   display: block;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.user-table th, .user-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.user-table th {
+  background-color: #e0e0e0;
+}
+
+#pagination{
+  margin-top: 8px;
+}
+
+#pagination button{
+  margin: 0 4px ;
 }

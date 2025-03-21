@@ -24,6 +24,7 @@ document
 
       if (response.data.token) {
         localStorage.setItem("authToken", response.data.token);
+        localStorage.setItem("userRole", response.data.role);
         window.location.href = "dashboard.html";
       } else {
         alert("Invalid credentials");

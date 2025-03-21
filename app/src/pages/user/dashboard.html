@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <link rel="stylesheet" href="./../../css/dashboard.css" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="./../../css/style.css" />
   </head>
   <body>
     <div class="logoutContainer">
@@ -13,13 +15,28 @@
     <div class="tabContainer">
       <div class="tabBtns">
         <button class="tab active" data-tab-target="#users-tab">Users</button>
-        <button class="tab" data-tab-target="#artist-tabs">Artists</button>
+        <button class="tab" data-tab-target="#artists-tab">Artists</button>
+        <button class="tab" data-tab-target="#songs-tab">Songs</button>
       </div>
 
       <div class="tabContent">
-        <div class="tabPanel active" id="users-tab">Tab 1 content</div>
+        <div class="tabPanel active" id="users-tab">
+          <div id="userContainer"></div>
+          <div id="pagination">
+            <button id="prevPage">Previous</button>
+            <span id="pageNumber">1</span>
+            <button id="nextPage">Next</button>
+          </div>
+        </div>
 
-        <div class="tabPanel" id="artist-tabs">Tab 2 content</div>
+        <div class="tabPanel" id="artists-tab">
+          <div id="artistContainer"></div>
+          <div id="pagination">
+            <button id="prevPage">Previous</button>
+            <span id="pageNumber">1</span>
+            <button id="nextPage">Next</button>
+          </div>
+        </div>
       </div>
     </div>
     <script type="module" src="../../js/dashboard.js"></script>
