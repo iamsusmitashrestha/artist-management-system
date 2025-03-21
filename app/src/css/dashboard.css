@@ -1,0 +1,60 @@
+.logoutContainer {
+  display: flex;
+  justify-content: flex-end; 
+  margin: 24px;
+}
+
+#logoutBtn {
+  padding: 12px;
+  background: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.tabContainer {
+  width: 90%;
+  margin: 0 auto;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tabBtns {
+  display: flex;
+  background-color: #f5f5f5;
+}
+
+.tab {
+  flex: 1;
+  font-size: 20px;
+  padding: 10px;
+  border: none;
+  background-color: #f5f5f5;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.tab:hover {
+  background-color: #e0e0e0;
+}
+
+.tab.active {
+  background-color:green;
+  color: #fff;
+}
+
+.tabContent {
+  padding: 20px;
+  background-color: #fff;
+}
+
+.tabPanel {
+  display: none;
+}
+
+.tabPanel.active {
+  display: block;
+}

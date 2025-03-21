@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="./../../css/dashboard.css" />
+  </head>
+  <body>
+    <div class="logoutContainer">
+      <button id="logoutBtn">Logout</button>
+    </div>
+    <div class="tabContainer">
+      <div class="tabBtns">
+        <button class="tab active" data-tab-target="#users-tab">Users</button>
+        <button class="tab" data-tab-target="#artist-tabs">Artists</button>
+      </div>
+
+      <div class="tabContent">
+        <div class="tabPanel active" id="users-tab">Tab 1 content</div>
+
+        <div class="tabPanel" id="artist-tabs">Tab 2 content</div>
+      </div>
+    </div>
+    <script type="module" src="../../js/dashboard.js"></script>
+  </body>
+</html>
