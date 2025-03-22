@@ -11,7 +11,7 @@ export function handleRoutes(req, res) {
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, OPTIONS"
   );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
   // Handle OPTIONS request for CORS preflight
   if (req.method === "OPTIONS") {
