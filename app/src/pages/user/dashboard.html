@@ -14,27 +14,27 @@
     </div>
     <div class="tabContainer">
       <div class="tabBtns">
-        <button class="tab active" data-tab-target="#users-tab">Users</button>
+        <button class="tab" data-tab-target="#users-tab">Users</button>
         <button class="tab" data-tab-target="#artists-tab">Artists</button>
         <button class="tab" data-tab-target="#songs-tab">Songs</button>
       </div>
 
       <div class="tabContent">
-        <div class="tabPanel active" id="users-tab">
+        <div class="tabPanel" id="users-tab">
           <div id="userContainer"></div>
-          <div id="pagination">
-            <button id="prevPage">Previous</button>
-            <span id="pageNumber">1</span>
-            <button id="nextPage">Next</button>
+          <div class="pagination">
+            <button id="prevUsersPage">Previous</button>
+            <span id="usersPageNumber">1</span>
+            <button id="nextUsersPage">Next</button>
           </div>
         </div>
 
         <div class="tabPanel" id="artists-tab">
           <div id="artistContainer"></div>
-          <div id="pagination">
-            <button id="prevPage">Previous</button>
-            <span id="pageNumber">1</span>
-            <button id="nextPage">Next</button>
+          <div class="pagination">
+            <button id="prevArtistsPage">Previous</button>
+            <span id="artistsPageNumber">1</span>
+            <button id="nextArtistsPage">Next</button>
           </div>
         </div>
       </div>

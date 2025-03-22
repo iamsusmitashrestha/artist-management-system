@@ -54,26 +54,26 @@
   display: block;
 }
 
-.user-table {
+.users-table,.artists-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
 }
 
-.user-table th, .user-table td {
+.users-table th,.artists-table th, .users-table td,.artists-table td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: left;
 }
 
-.user-table th {
+.users-table th,.artists-table th {
   background-color: #e0e0e0;
 }
 
-#pagination{
+.pagination{
   margin-top: 8px;
 }
 
-#pagination button{
+.pagination button{
   margin: 0 4px ;
 }

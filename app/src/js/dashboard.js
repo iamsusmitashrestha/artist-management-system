@@ -12,8 +12,6 @@ document.addEventListener("DOMContentLoaded", function () {
       localStorage.removeItem("authToken");
       window.location.href = "login.html";
     });
-  } else {
-    console.error("Logout button not found!");
   }
 
   const userRole = localStorage.getItem("userRole");
@@ -60,68 +58,96 @@ document.addEventListener("DOMContentLoaded", function () {
     button.addEventListener("click", (event) => {
       event.preventDefault();
       activateTab(index);
+
+      // const tabName = button.dataset.tabTarget.replace("#", "");
+      // if (tabName === "artists-tab" && !isArtistsFetched) {
+      //   fetchData("artists");
+      //   isArtistsFetched = true;
+      // }
     });
   });
 
-  let currentPage = DEFAULT_PAGE;
-  const prevButton = document.getElementById("prevPage");
-  const nextButton = document.getElementById("nextPage");
+  let currentPage = { users: DEFAULT_PAGE, artists: DEFAULT_PAGE };
+  let isArtistsFetched = false;
 
-  async function fetchUsers(page) {
+  const prevButtons = {
+    users: document.getElementById("prevUsersPage"),
+    artists: document.getElementById("prevArtistsPage"),
+  };
+
+  const nextButtons = {
+    users: document.getElementById("nextUsersPage"),
+    artists: document.getElementById("nextArtistsPage"),
+  };
+
+  const pageNumberDisplays = {
+    users: document.getElementById("usersPageNumber"),
+    artists: document.getElementById("artistsPageNumber"),
+  };
+
+  const containers = {
+    users: document.getElementById("userContainer"),
+    artists: document.getElementById("artistContainer"),
+  };
+
+  async function fetchData(type) {
     try {
-      const { data } = await axios.get(`${API_BASE_URL}/users`, {
+      const page = currentPage[type];
+      const { data } = await axios.get(`${API_BASE_URL}/${type}`, {
         params: { page, limit: DEFAULT_PAGE_SIZE },
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
       });
 
-      renderUsers(data.data);
-      document.getElementById("pageNumber").textContent = page;
+      if (type === "users") {
+        renderUsersTable(type, data.data);
+      }
 
-      prevButton.disabled = currentPage === 1;
-      nextButton.disabled = data.data.length < DEFAULT_PAGE_SIZE;
+      if (type === "artists") {
+        renderArtistsTable(type, data.data);
+      }
+
+      pageNumberDisplays[type].textContent = page;
+      prevButtons[type].disabled = currentPage[type] === 1;
+      nextButtons[type].disabled = data.data.length < DEFAULT_PAGE_SIZE;
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error(`Error fetching ${type}:`, error);
     }
   }
 
-  function renderUsers(users) {
-    const container = document.getElementById("userContainer");
+  function renderUsersTable(type, data) {
+    const container = containers[type];
     container.innerHTML = "";
-    // Create table element
     const table = document.createElement("table");
-    table.classList.add("user-table");
+    table.classList.add(`${type}-table`);
 
-    // Create table header
     const thead = document.createElement("thead");
     thead.innerHTML = `
-    <tr>
-      <th>Name</th>
-      <th>Email</th>
-      <th>Phone</th>
-      <th>Address</th>
-      <th>DOB</th>
-      <th>Gender</th>
-      <th>Role</th>
-    </tr>
-  `;
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Address</th>
+        <th>DOB</th>
+        <th>Gender</th>
+        <th>Role</th>
+      </tr>
+    `;
     table.appendChild(thead);
 
-    // Create table body
     const tbody = document.createElement("tbody");
-
-    users.forEach((user) => {
+    data.forEach((item) => {
       const row = document.createElement("tr");
       row.innerHTML = `
-      <td>${user.firstName} ${user.lastName}</td>
-      <td>${user.email}</td>
-      <td>${user.phone || "N/A"}</td>
-      <td>${user.address || "N/A"}</td>
-      <td>${formatDOB(user.dob)}</td>
-      <td>${user.gender || "N/A"}</td>
-      <td>${user.role}</td>
-    `;
+        <td>${item.firstName} ${item.lastName}</td>
+        <td>${item.email}</td>
+        <td>${item.phone || "N/A"}</td>
+        <td>${item.address || "N/A"}</td>
+        <td>${formatDOB(item.dob)}</td>
+        <td>${item.gender || "N/A"}</td>
+        <td>${item.role}</td>
+      `;
       tbody.appendChild(row);
     });
 
@@ -129,17 +155,57 @@ document.addEventListener("DOMContentLoaded", function () {
     container.appendChild(table);
   }
 
-  document.getElementById("prevPage").addEventListener("click", () => {
-    if (currentPage > 1) {
-      currentPage--;
-      fetchUsers(currentPage);
-    }
+  function renderArtistsTable(type, data) {
+    const container = containers[type];
+    container.innerHTML = "";
+    const table = document.createElement("table");
+    table.classList.add(`${type}-table`);
+
+    const thead = document.createElement("thead");
+    thead.innerHTML = `
+      <tr>
+        <th>Name</th>
+        <th>Address</th>
+        <th>DOB</th>
+        <th>Gender</th>
+        <th>First Release Year</th>
+        <th>No. of Albums released</th>
+      </tr>
+    `;
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    data.forEach((item) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${item.name}</td>
+        <td>${item.address}</td>
+        <td>${formatDOB(item.dob)}</td>
+        <td>${item.gender || "N/A"}</td>
+        <td>${item.firstReleaseYear || "N/A"}</td>
+        <td>${item.noOfAlbumsReleased}</td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    table.appendChild(tbody);
+    container.appendChild(table);
+  }
+
+  Object.keys(prevButtons).forEach((type) => {
+    prevButtons[type].addEventListener("click", () => {
+      if (currentPage[type] > 1) {
+        currentPage[type]--;
+        fetchData(type);
+      }
+    });
+
+    nextButtons[type].addEventListener("click", () => {
+      currentPage[type]++;
+      fetchData(type);
+    });
   });
 
-  document.getElementById("nextPage").addEventListener("click", () => {
-    currentPage++;
-    fetchUsers(currentPage);
-  });
-
-  fetchUsers(currentPage);
+  fetchData("users");
+  fetchData("artists");
 });
