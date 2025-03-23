@@ -14,14 +14,45 @@
     background-color: #e0e0e0;
   }
   
-  .pagination{
-    margin-top: 8px;
-  }
   
-  .pagination button{
-    margin: 0 4px ;
-  }
 
 #deleteSongBtn{
   background: rgb(211, 3, 3);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.close {
+    float: right;
+    cursor: pointer;
+}
+
+input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+label{
+    margin-bottom: 2px;
 }

@@ -14,7 +14,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "jwt_secret";
  * @returns {Promise}
  */
 export async function createUser(userData) {
-  const { password, email } = userData;
+  const { password, email, role } = userData;
 
   const existingUser = await getUserByEmail(email);
 
@@ -28,6 +28,8 @@ export async function createUser(userData) {
   // Hash password before saving
   const hashedPassword = await bcrypt.hash(password, 10);
 
+  if (role === "artist") {
+  }
   return create({ ...userData, password: hashedPassword });
 }
 
@@ -49,5 +51,5 @@ export async function login(userData) {
     expiresIn: "12h",
   });
 
-  return { message: "Login successful", token, role: user.role };
+  return { message: "Login successful", token, role: user.role, id: user.id };
 }

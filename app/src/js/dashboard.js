@@ -23,7 +23,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const tabConfig = {
     super_admin: ["users-tab", "artists-tab"],
     artist_manager: ["artists-tab"],
-    artist: ["songs-tab"],
   };
 
   const allowedTabs = tabConfig[userRole] || [];

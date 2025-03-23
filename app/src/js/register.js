@@ -72,14 +72,16 @@ document.addEventListener("DOMContentLoaded", () => {
         `${API_BASE_URL}/auth/register`,
         userData
       );
+      window.location.href = "login.html";
 
-      if (response.status === statusCodes.CREATED) {
-        showToast("Registration successful!", RESPONSE_TYPE.SUCCESS);
-        // navigateTo("/login");
-        // form.reset();
-      }
+      // if (response.status === statusCodes.CREATED) {
+      //   showToast("Registration successful!", RESPONSE_TYPE.SUCCESS);
+      //   // navigateTo("/login");
+      //   // form.reset();
+      // }
     } catch (error) {
-      showToast("Something went wrong");
+      console.log(error);
+      // showToast("Something went wrong");
     }
   });
 });

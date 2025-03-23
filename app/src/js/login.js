@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "../constants/common.js";
+import { API_BASE_URL, ROLES } from "../constants/common.js";
 import { showToast } from "./toast.js";
 // import statusCodes from "http-status-codes";
 
@@ -25,8 +25,12 @@ document
       if (response.data.token) {
         localStorage.setItem("authToken", response.data.token);
         localStorage.setItem("userRole", response.data.role);
-        localStorage.setItem("userId", response.data.user.id);
-        window.location.href = "dashboard.html";
+
+        if (response.data.role === ROLES.ARTIST) {
+          window.location.href = `song.html?artistId=${response.data.id}`;
+        } else {
+          window.location.href = "dashboard.html";
+        }
       } else {
         alert("Invalid credentials");
       }

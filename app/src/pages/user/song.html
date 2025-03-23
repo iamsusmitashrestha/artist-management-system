@@ -7,10 +7,31 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <link rel="stylesheet" href="../../css/style.css" />
     <link rel="stylesheet" href="../../css/song.css" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   </head>
   <body>
     <!-- <button onclick="goBack()">⬅ Back</button> -->
     <h2>Artist Songs</h2>
+    <button id="createSongBtn">Create</button>
+    <div id="songModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <span id="closeModal" class="close">&times;</span>
+        <h2 id="modalTitle">Create New Song</h2>
+        <form id="songForm">
+          <input type="hidden" id="songId" />
+          <label for="title">Title</label>
+          <input type="text" id="title" required />
+
+          <label for="albumName">Album Name</label>
+          <input type="text" id="albumName" required />
+
+          <label for="genre">Genre</label>
+          <input type="text" id="genre" required />
+
+          <button type="submit">Save Song</button>
+        </form>
+      </div>
+    </div>
     <div id="songsContainer"></div>
     <script type="module" src="../../js/song.js"></script>
   </body>
