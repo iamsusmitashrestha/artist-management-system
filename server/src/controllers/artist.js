@@ -100,3 +100,18 @@ export async function deleteArtist(req, res, artistId) {
     res.end(JSON.stringify({ error: error.message }));
   }
 }
+
+export async function importArtists(req, res) {
+  try {
+    const body = await parseRequestBody(req);
+    await artistService.importArtists(body);
+
+    res.writeHead(StatusCodes.CREATED, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ message: "Artists imported successfully" }));
+  } catch (error) {
+    res.writeHead(StatusCodes.BAD_REQUEST, {
+      "Content-Type": "application/json",
+    });
+    res.end(JSON.stringify({ error: error.message }));
+  }
+}

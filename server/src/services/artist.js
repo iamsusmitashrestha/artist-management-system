@@ -15,12 +15,12 @@ export async function getArtist(artistId) {
 }
 
 // Get All Artists
-export async function getAllArtists(page,size) {
-    const { data, count } = await artistModel.getAll(page, size);
+export async function getAllArtists(page, size) {
+  const { data, count } = await artistModel.getAll(page, size);
 
-    const meta = getMeta(page, size, count);
-  
-    return { data, meta };
+  const meta = getMeta(page, size, count);
+
+  return { data, meta };
 }
 
 // Update Artist
@@ -36,4 +36,13 @@ export async function updateArtist(artistId, artistData) {
 // Delete Artist
 export async function deleteArtist(artistId) {
   return artistModel.deleteArtist(artistId);
+}
+
+export async function importArtists(artists) {
+  for (const artist of artists) {
+    const { error } = artistSchema.validate(artist);
+    if (error) throw new Error(error.details[0].message);
+
+    await artistModel.create(artist);
+  }
 }

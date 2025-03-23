@@ -7,6 +7,7 @@ import {
   deleteArtist,
   getAllArtists,
   getArtistById,
+  importArtists,
   updateArtist,
 } from "../controllers/artist.js";
 
@@ -52,6 +53,10 @@ export function handleArtistRoutes(req, res) {
         const artistId = req.url.split("/")[2];
 
         await deleteArtist(req, res, artistId);
+      });
+    } else if (req.method === METHOD.POST && req.url === "/artists/import") {
+      requireRole([ROLES.ARTIST_MANAGER])(req, res, async () => {
+        await importArtists(req, res);
       });
     } else {
       res.writeHead(StatusCodes.NOT_FOUND, {
