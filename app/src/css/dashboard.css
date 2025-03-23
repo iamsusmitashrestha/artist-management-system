@@ -146,7 +146,7 @@ input, select {
   cursor: pointer;
 }
 
-#deleteBtn {
+#deleteBtn, #deleteArtistBtn {
   background: rgb(211, 3, 3);
  
 }

@@ -184,6 +184,10 @@ document.addEventListener("DOMContentLoaded", function () {
         <td>${item.gender || "N/A"}</td>
         <td>${item.firstReleaseYear || "N/A"}</td>
         <td>${item.noOfAlbumsReleased}</td>
+        <td>
+          <button id="editArtistBtn" data-id="${item.id}">Edit</button>
+          <button id="deleteArtistBtn" data-id="${item.id}">Delete</button>
+        </td>
       `;
       tbody.appendChild(row);
     });
@@ -388,6 +392,142 @@ document.addEventListener("DOMContentLoaded", function () {
       fetchData("users");
     } catch (error) {
       console.error("Error saving user:", error);
+    }
+  });
+
+  // create ARtist
+  const artistModal = document.getElementById("artistModal");
+  const createArtistBtn = document.getElementById("createArtistBtn");
+  const closeArtistBtn = document.querySelector(".closeArtist");
+  const saveArtistBtn = document.getElementById("saveArtistBtn");
+  let editingArtistId = null;
+
+  const artistName = document.getElementById("artistName");
+  const artistGender = document.getElementById("artistGender");
+  const artistAddress = document.getElementById("artistAddress");
+  const artistDOB = document.getElementById("artistDOB");
+  const firstReleaseYear = document.getElementById("firstReleaseYear");
+  const albumsReleased = document.getElementById("albumsReleased");
+
+  // Open Artist Modal
+  createArtistBtn.onclick = function () {
+    clearArtistForm();
+    artistModal.style.display = "flex";
+    editingArtistId = null;
+  };
+
+  // Close Artist Modal
+  closeArtistBtn.onclick = function () {
+    artistModal.style.display = "none";
+  };
+
+  window.onclick = function (event) {
+    if (event.target === artistModal) {
+      artistModal.style.display = "none";
+    }
+  };
+
+  // Clear Artist Form
+  function clearArtistForm() {
+    artistName.value = "";
+    artistGender.value = "";
+    artistAddress.value = "";
+    artistDOB.value = "";
+    firstReleaseYear.value = "";
+    albumsReleased.value = "";
+  }
+
+  document.addEventListener("click", async function (event) {
+    if (event.target && event.target.id === "editArtistBtn") {
+      const artistId = event.target.dataset.id;
+      console.log(artistId);
+      await fetchArtistDetails(artistId);
+    }
+  });
+
+  async function fetchArtistDetails(artistId) {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/artists/${artistId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const artist = response.data;
+
+      artistName.value = artist.name || "";
+      artistGender.value = artist.gender || "";
+      artistAddress.value = artist.address || "";
+      artistDOB.value = artist.dob ? artist.dob.split("T")[0] : "";
+      firstReleaseYear.value = artist.firstReleaseYear || "";
+      albumsReleased.value = artist.noOfAlbumsReleased || "";
+
+      editingArtistId = artistId;
+      artistModal.style.display = "flex";
+    } catch (error) {
+      console.error("Error fetching artist details:", error);
+    }
+  }
+
+  // Save Artist
+  saveArtistBtn.addEventListener("click", async function (event) {
+    event.preventDefault();
+    let valid = true;
+
+    const artistData = {
+      name: artistName.value.trim(),
+      gender: artistGender.value,
+      address: artistAddress.value.trim(),
+      dob: artistDOB.value,
+      firstReleaseYear: firstReleaseYear.value,
+      noOfAlbumsReleased: albumsReleased.value,
+    };
+
+    for (const key in artistData) {
+      if (!artistData[key]) {
+        valid = false;
+        alert(`${key} is required`);
+        break;
+      }
+    }
+
+    if (!valid) return;
+
+    try {
+      if (editingArtistId) {
+        await axios.put(
+          `${API_BASE_URL}/artists/${editingArtistId}`,
+          artistData,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        alert("Artist updated successfully!");
+      } else {
+        await axios.post(`${API_BASE_URL}/artists`, artistData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        alert("Artist created successfully!");
+      }
+
+      artistModal.style.display = "none";
+      fetchData("artists");
+    } catch (error) {
+      console.error("Error saving artist:", error);
+    }
+  });
+
+  document.addEventListener("click", async function (event) {
+    if (event.target.id === "deleteArtistBtn") {
+      const artistId = event.target.dataset.id;
+
+      if (confirm("Are you sure you want to delete this artist?")) {
+        try {
+          await axios.delete(`${API_BASE_URL}/artists/${artistId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          alert("Artist deleted successfully!");
+          fetchData("artists");
+        } catch (error) {
+          console.error("Error deleting artist:", error);
+        }
+      }
     }
   });
 });
