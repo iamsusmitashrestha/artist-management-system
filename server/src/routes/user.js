@@ -3,13 +3,28 @@ import { StatusCodes } from "http-status-codes";
 import { METHOD, ROLES } from "../constants/common.js";
 import { requireRole, verifyToken } from "../middleware/auth.js";
 import { registerUser } from "../controllers/auth.js";
-import { deleteUser, getAllUsers, updateUser } from "../controllers/user.js";
+import {
+  deleteUser,
+  getAllUsers,
+  getUserById,
+  updateUser,
+} from "../controllers/user.js";
 
 export function handleUserRoutes(req, res) {
   verifyToken(req, res, () => {
-    if (req.method === METHOD.GET && req.url.startsWith("/users")) {
+    if (
+      req.method === METHOD.GET &&
+      req.url.startsWith("/users") &&
+      !/^\/users\/\d+$/.test(req.url)
+    ) {
       requireRole([ROLES.SUPER_ADMIN])(req, res, async () => {
         await getAllUsers(req, res);
+      });
+    } else if (req.method === METHOD.GET && /^\/users\/\d+$/.test(req.url)) {
+      requireRole([ROLES.SUPER_ADMIN])(req, res, async () => {
+        const userId = req.url.split("/")[2];
+
+        await getUserById(req, res, userId);
       });
     } else if (req.method === METHOD.POST && req.url === "/users") {
       requireRole([ROLES.SUPER_ADMIN])(req, res, async () => {

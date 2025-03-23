@@ -22,19 +22,36 @@ export async function getAllUsers(req, res) {
   }
 }
 
+// Get user by ID
+export async function getUserById(req, res, userId) {
+  try {
+    const user = await userService.getUserById(userId);
+
+    res.writeHead(StatusCodes.OK, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(user));
+  } catch (error) {
+    res.writeHead(StatusCodes.BAD_REQUEST, {
+      "Content-Type": "application/json",
+    });
+    res.end(JSON.stringify({ error: error.message }));
+  }
+}
+
 /**
  * Update user by ID
  */
 export async function updateUser(req, res, userId) {
   try {
-    const existingUser=await userService.getUserById(userId);
+    const existingUser = await userService.getUserById(userId);
 
     if (!existingUser) {
-      res.writeHead(StatusCodes.NOT_FOUND, { "Content-Type": "application/json" });
+      res.writeHead(StatusCodes.NOT_FOUND, {
+        "Content-Type": "application/json",
+      });
       res.end(JSON.stringify({ message: "User not found" }));
       return;
     }
-    
+
     const body = await parseRequestBody(req);
     const user = await userService.updateUser(userId, body);
 
@@ -53,10 +70,12 @@ export async function updateUser(req, res, userId) {
  */
 export async function deleteUser(req, res, userId) {
   try {
-    const existingUser=await userService.getUserById(userId);
+    const existingUser = await userService.getUserById(userId);
 
     if (!existingUser) {
-      res.writeHead(StatusCodes.NOT_FOUND, { "Content-Type": "application/json" });
+      res.writeHead(StatusCodes.NOT_FOUND, {
+        "Content-Type": "application/json",
+      });
       res.end(JSON.stringify({ message: "User not found" }));
       return;
     }
