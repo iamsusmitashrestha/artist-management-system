@@ -161,6 +161,10 @@
               <button id="saveArtistBtn">Save</button>
             </div>
           </div>
+          <div class="artist-actions">
+            <button id="exportArtistsBtn">Export Artists</button>
+            <input type="file" id="importArtistsInput" accept=".csv" />
+          </div>
 
           <div id="artistContainer"></div>
           <div class="pagination">
@@ -172,5 +176,7 @@
       </div>
     </div>
     <script type="module" src="../../js/dashboard.js"></script>
+    <script type="module" src="../../js/artist.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   </body>
 </html>
