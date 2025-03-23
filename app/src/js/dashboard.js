@@ -177,7 +177,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const tbody = document.createElement("tbody");
     data.forEach((item) => {
       const row = document.createElement("tr");
-      row.innerHTML = `
+
+      if (userRole === ROLES.SUPER_ADMIN) {
+        row.innerHTML = `
         <td>${item.name}</td>
         <td>${item.address}</td>
         <td>${formatDOB(item.dob)}</td>
@@ -185,10 +187,26 @@ document.addEventListener("DOMContentLoaded", function () {
         <td>${item.firstReleaseYear || "N/A"}</td>
         <td>${item.noOfAlbumsReleased}</td>
         <td>
-          <button id="editArtistBtn" data-id="${item.id}">Edit</button>
-          <button id="deleteArtistBtn" data-id="${item.id}">Delete</button>
-        </td>
+          <button id="viewSongsBtn" data-id="${item.id}">View songs</button>
+          </td>
       `;
+      }
+
+      if (userRole === ROLES.ARTIST_MANAGER) {
+        row.innerHTML = `
+          <td>${item.name}</td>
+          <td>${item.address}</td>
+          <td>${formatDOB(item.dob)}</td>
+          <td>${item.gender || "N/A"}</td>
+          <td>${item.firstReleaseYear || "N/A"}</td>
+          <td>${item.noOfAlbumsReleased}</td>
+          <td>
+            <button id="editArtistBtn" data-id="${item.id}">Edit</button>
+            <button id="deleteArtistBtn" data-id="${item.id}">Delete</button>
+            <button id="viewSongsBtn" data-id="${item.id}">View songs</button>
+          </td>
+        `;
+      }
       tbody.appendChild(row);
     });
 
@@ -528,6 +546,13 @@ document.addEventListener("DOMContentLoaded", function () {
           console.error("Error deleting artist:", error);
         }
       }
+    }
+  });
+
+  document.addEventListener("click", async function (event) {
+    if (event.target && event.target.id === "viewSongsBtn") {
+      const artistId = event.target.dataset.id;
+      window.location.href = `song.html?artistId=${artistId}`;
     }
   });
 });

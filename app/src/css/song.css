@@ -1,0 +1,27 @@
+.songs-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  .songs-table th , .songs-table td  {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .songs-table th  {
+    background-color: #e0e0e0;
+  }
+  
+  .pagination{
+    margin-top: 8px;
+  }
+  
+  .pagination button{
+    margin: 0 4px ;
+  }
+
+#deleteSongBtn{
+  background: rgb(211, 3, 3);
+}

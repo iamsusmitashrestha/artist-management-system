@@ -25,6 +25,7 @@ document
       if (response.data.token) {
         localStorage.setItem("authToken", response.data.token);
         localStorage.setItem("userRole", response.data.role);
+        localStorage.setItem("userId", response.data.user.id);
         window.location.href = "dashboard.html";
       } else {
         alert("Invalid credentials");
