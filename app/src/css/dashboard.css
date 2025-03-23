@@ -145,3 +145,8 @@ input, select {
   height: 20px;
   cursor: pointer;
 }
+
+#deleteBtn {
+  background: rgb(211, 3, 3);
+ 
+}

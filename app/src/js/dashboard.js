@@ -2,6 +2,7 @@ import {
   API_BASE_URL,
   DEFAULT_PAGE,
   DEFAULT_PAGE_SIZE,
+  ROLES,
 } from "../constants/common.js";
 import { clearError, formatDOB, showError } from "../utils/common.js";
 // import { showToast } from "./toast.js";
@@ -144,6 +145,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <td>${item.role}</td>
         <td>
           <button id="editBtn" data-id="${item.id}">Edit</button>
+          <button id="deleteBtn" data-id="${item.id}">Delete</button>
         </td>
       `;
       tbody.appendChild(row);
@@ -204,13 +206,17 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  fetchData("users");
-  fetchData("artists");
+  if (userRole === ROLES.SUPER_ADMIN) {
+    fetchData("users");
+    fetchData("artists");
+    document.getElementById("createArtistBtn").style.display = "none";
+  } else if (userRole === ROLES.ARTIST_MANAGER) {
+    fetchData("artists");
+  }
 
   // Create user
   const modal = document.getElementById("userModal");
   const createBtn = document.getElementById("createBtn");
-  const editBtn = document.getElementById("editBtn");
 
   const closeBtn = document.querySelector(".close");
   const saveButton = document.getElementById("saveBtn");
@@ -238,6 +244,27 @@ document.addEventListener("DOMContentLoaded", function () {
       fetchUserDetails(userId);
     }
   });
+
+  document.addEventListener("click", function (event) {
+    if (event.target && event.target.id === "deleteBtn") {
+      const userId = event.target.dataset.id;
+      deleteUser(userId);
+    }
+  });
+
+  // Delete user
+  async function deleteUser(userId) {
+    try {
+      await axios.delete(`${API_BASE_URL}/users/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+      fetchData("users");
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
+  }
 
   async function fetchUserDetails(userId) {
     try {
