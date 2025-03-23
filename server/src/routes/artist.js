@@ -6,17 +6,32 @@ import {
   createArtist,
   deleteArtist,
   getAllArtists,
+  getArtistById,
   updateArtist,
 } from "../controllers/artist.js";
 
 export function handleArtistRoutes(req, res) {
   verifyToken(req, res, () => {
-    if (req.method === METHOD.GET && req.url.startsWith("/artists")) {
+    if (
+      req.method === METHOD.GET &&
+      req.url.startsWith("/artists") &&
+      !/^\/artists\/\d+$/.test(req.url)
+    ) {
       requireRole([ROLES.SUPER_ADMIN, ROLES.ARTIST_MANAGER])(
         req,
         res,
         async () => {
           await getAllArtists(req, res);
+        }
+      );
+    } else if (req.method === METHOD.GET && /^\/artists\/\d+$/.test(req.url)) {
+      requireRole([ROLES.SUPER_ADMIN, ROLES.ARTIST_MANAGER])(
+        req,
+        res,
+        async () => {
+          const userId = req.url.split("/")[2];
+
+          await getArtistById(req, res, userId);
         }
       );
     } else if (req.method === METHOD.POST && req.url === "/artists") {

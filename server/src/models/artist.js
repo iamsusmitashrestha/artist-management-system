@@ -55,7 +55,16 @@ export async function get(artistId) {
   return new Promise((resolve, reject) => {
     connection.query(query, [artistId], (err, results) => {
       if (err) reject(err);
-      else resolve(results[0]);
+      const data = results.map((artist) => ({
+        id: artist.id,
+        name: artist.name,
+        dob: artist.dob,
+        gender: artist.gender,
+        address: artist.address,
+        firstReleaseYear: artist.first_release_year,
+        noOfAlbumsReleased: artist.no_of_albums_released,
+      }));
+      resolve(data[0]);
     });
   });
 }

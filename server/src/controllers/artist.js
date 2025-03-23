@@ -36,6 +36,21 @@ export async function getAllArtists(req, res) {
   }
 }
 
+// Get artist by ID
+export async function getArtistById(req, res, artistId) {
+  try {
+    const artist = await artistService.getArtist(artistId);
+
+    res.writeHead(StatusCodes.OK, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(artist));
+  } catch (error) {
+    res.writeHead(StatusCodes.BAD_REQUEST, {
+      "Content-Type": "application/json",
+    });
+    res.end(JSON.stringify({ error: error.message }));
+  }
+}
+
 // Update Artist
 export async function updateArtist(req, res, artistId) {
   try {
