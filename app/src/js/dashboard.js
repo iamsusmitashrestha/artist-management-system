@@ -142,6 +142,9 @@ document.addEventListener("DOMContentLoaded", function () {
         <td>${formatDOB(item.dob)}</td>
         <td>${item.gender || "N/A"}</td>
         <td>${item.role}</td>
+        <td>
+          <button id="editBtn" data-id="${item.id}">Edit</button>
+        </td>
       `;
       tbody.appendChild(row);
     });
@@ -207,11 +210,16 @@ document.addEventListener("DOMContentLoaded", function () {
   // Create user
   const modal = document.getElementById("userModal");
   const createBtn = document.getElementById("createBtn");
+  const editBtn = document.getElementById("editBtn");
+
   const closeBtn = document.querySelector(".close");
-  const submitBtn = document.getElementById("submitBtn");
+  const saveButton = document.getElementById("saveBtn");
+  let editingUserId = null;
 
   createBtn.onclick = function () {
+    clearUserForm();
     modal.style.display = "flex";
+    editingUserId = null;
   };
 
   closeBtn.onclick = function () {
@@ -224,7 +232,49 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   };
 
-  const saveButton = document.getElementById("saveBtn");
+  document.addEventListener("click", function (event) {
+    if (event.target && event.target.id === "editBtn") {
+      const userId = event.target.dataset.id;
+      fetchUserDetails(userId);
+    }
+  });
+
+  async function fetchUserDetails(userId) {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/users/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+
+      const user = response.data;
+      firstName.value = user.firstName || "";
+      lastName.value = user.lastName || "";
+      email.value = user.email || "";
+      phone.value = user.phone || "";
+      dob.value = user.dob ? user.dob.split("T")[0] : "";
+      gender.value = user.gender || "";
+      address.value = user.address || "";
+      password.value = "";
+      role.value = user.role || "";
+      editingUserId = userId;
+      userModal.style.display = "block";
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
+  }
+
+  function clearUserForm() {
+    firstName.value = "";
+    lastName.value = "";
+    email.value = "";
+    phone.value = "";
+    dob.value = "";
+    gender.value = "";
+    address.value = "";
+    password.value = "";
+    role.value = "";
+  }
 
   saveButton.addEventListener("click", async (event) => {
     event.preventDefault();
@@ -289,19 +339,40 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/users`, userData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      modal.style.display = "none";
+      if (editingUserId) {
+        // Update existing user
+        await axios.put(`${API_BASE_URL}/users/${editingUserId}`, userData, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
+        alert("User updated successfully!");
+      } else {
+        // Create new user
+        await axios.post(`${API_BASE_URL}/users`, userData, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
+        alert("User created successfully!");
+      }
 
-      // if (response.status === statusCodes.CREATED) {
-      //   showToast("User created successfully", RESPONSE_TYPE.SUCCESS);
-      // }
+      userModal.style.display = "none";
+      fetchData("users");
     } catch (error) {
-      console.log("Something went wrong");
-      // showToast("Something went wrong");
+      console.error("Error saving user:", error);
     }
   });
 });
+
+document
+  .getElementById("togglePassword")
+  .addEventListener("click", function () {
+    const passwordField = document.getElementById("password");
+    passwordField.type =
+      passwordField.type === "password" ? "text" : "password";
+    this.src =
+      passwordField.type === "password"
+        ? "https://cdn-icons-png.flaticon.com/512/159/159604.png"
+        : "https://cdn-icons-png.flaticon.com/512/565/565655.png";
+  });
