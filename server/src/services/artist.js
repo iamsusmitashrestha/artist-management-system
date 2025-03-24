@@ -35,8 +35,6 @@ export async function validateArtist(artistData) {
   if (artist) {
     throw new AppError("Artist with email already exists", 400);
   }
-
-  return artistModel.validateArtist(artistData);
 }
 
 // Get Artist

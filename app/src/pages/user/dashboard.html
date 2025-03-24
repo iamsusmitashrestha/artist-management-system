@@ -25,7 +25,7 @@
           <div id="userModal" class="modal" style="display: none">
             <div class="modal-content">
               <span class="close">&times;</span>
-              <h2>Create / Update User</h2>
+              <h2 id="userModalTitle">Create New User</h2>
               <div class="form-group">
                 <div class="input-group">
                   <label for="firstName">First Name</label>
@@ -120,12 +120,17 @@
           <div id="artistModal" class="modal" style="display: none">
             <div class="modal-content">
               <span class="closeArtist">&times;</span>
-              <h2>Create / Update Artist</h2>
+              <h2 id="artistModalTitle">Create New Artist</h2>
 
               <div class="form-group">
                 <div class="input-group">
                   <label for="artistName">Name</label>
                   <input type="text" id="artistName" required />
+                </div>
+
+                <div class="input-group">
+                  <label for="artistEmail">Email</label>
+                  <input type="text" id="artistEmail" required />
                 </div>
 
                 <div class="input-group">
