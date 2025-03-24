@@ -22,7 +22,13 @@ export function showToast(message, type) {
     duration: 3000,
     gravity: "top",
     position: "right",
-    backgroundColor: type === "success" ? "green" : "red",
+    style: {
+      backgroundColor: type === "success" ? "green" : "red",
+      color: "#fff",
+      maxWidth: "300px",
+      width: "auto",
+      padding: "10px",
+    },
     stopOnFocus: true,
     close: true,
   }).showToast();

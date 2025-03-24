@@ -2,6 +2,8 @@ import * as userModel from "../models/user.js";
 import { getMeta } from "../utils/pagination.js";
 import { updateUserSchema } from "../schema/user.js";
 import { AppError } from "../utils/errorHandler.js";
+import { deleteArtist } from "../models/artist.js";
+import { deleteSongByArtistId } from "../models/song.js";
 
 export async function getAllUsers(page, size) {
   const { data, count } = await userModel.getAllUsers(page, size);
@@ -41,5 +43,11 @@ export async function updateUser(userId, updatedData) {
  * Delete user by ID
  */
 export async function deleteUser(userId) {
-  return userModel.deleteUser(userId);
+  const user = await userModel.deleteUser(userId);
+
+  console.log(user);
+
+  await deleteArtist(user.artistId);
+
+  return deleteSongByArtistId(user.artistId);
 }

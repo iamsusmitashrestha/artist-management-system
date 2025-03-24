@@ -40,8 +40,8 @@ document.addEventListener("DOMContentLoaded", function () {
           artist.email || "N/A",
           artist.dob || "N/A",
           artist.gender || "N/A",
-          artist.firstReleaseYear || "N/A",
-          artist.noOfAlbumsReleased || "N/A",
+          artist.firstReleaseYear || Date().getFullYear(),
+          artist.noOfAlbumsReleased || 0,
         ]),
       ]
         .map((row) => row.map((cell) => `"${cell}"`).join(","))

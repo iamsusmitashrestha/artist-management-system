@@ -149,3 +149,14 @@ export async function deleteUser(userId) {
     });
   });
 }
+
+//Delete user by artistId
+export async function deleteUserByArtistId(artistId) {
+  const query = `DELETE FROM user WHERE artist_id = ?`;
+  return new Promise((resolve, reject) => {
+    connection.query(query, [artistId], (err, results) => {
+      if (err) reject(err);
+      else resolve(results);
+    });
+  });
+}

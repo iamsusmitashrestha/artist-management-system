@@ -2,6 +2,8 @@ import { artistSchema } from "../schema/artist.js";
 import * as artistModel from "../models/artist.js";
 import { getMeta } from "../utils/pagination.js";
 import { AppError } from "../utils/errorHandler.js";
+import { deleteSongByArtistId } from "../models/song.js";
+import { deleteUserByArtistId } from "../models/user.js";
 
 export async function createArtist(artistData) {
   const { error } = artistSchema.validate(artistData);
@@ -65,5 +67,9 @@ export async function updateArtist(artistId, artistData) {
 
 // Delete Artist
 export async function deleteArtist(artistId) {
-  return artistModel.deleteArtist(artistId);
+  await artistModel.deleteArtist(artistId);
+
+  await deleteSongByArtistId(artistId);
+
+  return deleteUserByArtistId(artistId);
 }
