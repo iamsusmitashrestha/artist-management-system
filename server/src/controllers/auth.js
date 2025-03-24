@@ -3,6 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import { createUser, login } from "../services/auth.js";
 import logger from "../utils/logger.js";
 import { parseRequestBody } from "../utils/parse.js";
+import { handleError } from "../utils/errorHandler.js";
 
 // Create User
 export async function registerUser(req, res) {
@@ -15,10 +16,8 @@ export async function registerUser(req, res) {
     res.end(JSON.stringify({ message: "User created successfully" }));
   } catch (error) {
     logger.error("Error:", error.message);
-    res.writeHead(StatusCodes.BAD_REQUEST, {
-      "Content-Type": "application/json",
-    });
-    res.end(JSON.stringify({ error: error.message }));
+
+    handleError(res, error);
   }
 }
 
@@ -32,7 +31,7 @@ export async function loginUser(req, res) {
     res.end(JSON.stringify(result));
   } catch (error) {
     logger.error("Error:", error.message);
-    res.writeHead(StatusCodes.UNAUTHORIZED, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ error: error.message }));
+
+    handleError(res, error);
   }
 }

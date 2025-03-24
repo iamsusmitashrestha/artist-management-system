@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes";
 import { parseRequestBody } from "../utils/parse.js";
 import * as userService from "../services/user.js";
 import { buildPageParams } from "../utils/pagination.js";
+import { handleError } from "../utils/errorHandler.js";
 
 /**
  * Get all users
@@ -58,10 +59,7 @@ export async function updateUser(req, res, userId) {
     res.writeHead(StatusCodes.OK, { "Content-Type": "application/json" });
     res.end(JSON.stringify(user));
   } catch (error) {
-    res.writeHead(StatusCodes.BAD_REQUEST, {
-      "Content-Type": "application/json",
-    });
-    res.end(JSON.stringify({ error: error.message }));
+    handleError(res, error);
   }
 }
 
@@ -85,9 +83,6 @@ export async function deleteUser(req, res, userId) {
     res.writeHead(StatusCodes.OK, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ message }));
   } catch (error) {
-    res.writeHead(StatusCodes.BAD_REQUEST, {
-      "Content-Type": "application/json",
-    });
-    res.end(JSON.stringify({ error: error.message }));
+    handleError(res, error);
   }
 }

@@ -2,6 +2,7 @@
 CREATE TABLE IF NOT EXISTS artist (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
     dob DATETIME NOT NULL,
     gender ENUM('M', 'F', 'O') NOT NULL,
     address VARCHAR(255) NOT NULL,

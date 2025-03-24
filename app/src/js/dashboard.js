@@ -2,9 +2,16 @@ import {
   API_BASE_URL,
   DEFAULT_PAGE,
   DEFAULT_PAGE_SIZE,
+  RESPONSE_TYPE,
   ROLES,
 } from "../constants/common.js";
-import { clearError, formatDOB, showError } from "../utils/common.js";
+import {
+  clearError,
+  formatDOB,
+  handleError,
+  showError,
+  showToast,
+} from "../utils/common.js";
 // import { showToast } from "./toast.js";
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -107,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
       prevButtons[type].disabled = currentPage[type] === 1;
       nextButtons[type].disabled = data.data.length < DEFAULT_PAGE_SIZE;
     } catch (error) {
-      console.error(`Error fetching ${type}:`, error);
+      handleError(error);
     }
   }
 
@@ -276,14 +283,17 @@ document.addEventListener("DOMContentLoaded", function () {
   // Delete user
   async function deleteUser(userId) {
     try {
-      await axios.delete(`${API_BASE_URL}/users/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-      });
-      fetchData("users");
+      if (confirm("Are you sure you want to delete this user?")) {
+        await axios.delete(`${API_BASE_URL}/users/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
+        showToast("User deleted successfully", RESPONSE_TYPE.SUCCESS);
+        fetchData("users");
+      }
     } catch (error) {
-      console.error("Error deleting user:", error);
+      handleError(error);
     }
   }
 
@@ -308,7 +318,7 @@ document.addEventListener("DOMContentLoaded", function () {
       editingUserId = userId;
       userModal.style.display = "block";
     } catch (error) {
-      console.error("Error fetching user details:", error);
+      handleError(error);
     }
   }
 
@@ -394,7 +404,7 @@ document.addEventListener("DOMContentLoaded", function () {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
         });
-        alert("User updated successfully!");
+        showToast("User updated successfully", RESPONSE_TYPE.SUCCESS);
       } else {
         // Create new user
         await axios.post(`${API_BASE_URL}/users`, userData, {
@@ -402,13 +412,13 @@ document.addEventListener("DOMContentLoaded", function () {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
         });
-        alert("User created successfully!");
+        showToast("User created successfully", RESPONSE_TYPE.SUCCESS);
       }
 
       userModal.style.display = "none";
       fetchData("users");
     } catch (error) {
-      console.error("Error saving user:", error);
+      handleError(error);
     }
   });
 
@@ -480,7 +490,7 @@ document.addEventListener("DOMContentLoaded", function () {
       editingArtistId = artistId;
       artistModal.style.display = "flex";
     } catch (error) {
-      console.error("Error fetching artist details:", error);
+      handleError(error);
     }
   }
 
@@ -515,18 +525,18 @@ document.addEventListener("DOMContentLoaded", function () {
           artistData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        alert("Artist updated successfully!");
+        showToast("Artist updated successfully", RESPONSE_TYPE.SUCCESS);
       } else {
         await axios.post(`${API_BASE_URL}/artists`, artistData, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        alert("Artist created successfully!");
+        showToast("Artist created successfully!", RESPONSE_TYPE.SUCCESS);
       }
 
       artistModal.style.display = "none";
       fetchData("artists");
     } catch (error) {
-      console.error("Error saving artist:", error);
+      handleError(error);
     }
   });
 
@@ -539,10 +549,10 @@ document.addEventListener("DOMContentLoaded", function () {
           await axios.delete(`${API_BASE_URL}/artists/${artistId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          alert("Artist deleted successfully!");
+          showToast("Artist deleted successfully!", RESPONSE_TYPE.SUCCESS);
           fetchData("artists");
         } catch (error) {
-          console.error("Error deleting artist:", error);
+          handleError(error);
         }
       }
     }

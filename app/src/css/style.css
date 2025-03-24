@@ -1,14 +1,14 @@
-a:active{
+a:active {
     color: blue;
 }
 
-a{
+a {
     color: green;
     text-decoration: none;
     text-align: center;
 }
 
-button{
+button {
     padding: 8px 12px;
     background: #28a745;
     color: #fff;
@@ -16,3 +16,21 @@ button{
     border-radius: 4px;
     cursor: pointer;
 }
+
+input,
+select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+label {
+    margin-bottom: 2px;
+}
+
+.logoutContainer {
+    display: flex;
+    justify-content: flex-end; 
+    margin: 24px;
+  }

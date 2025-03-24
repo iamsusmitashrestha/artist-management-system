@@ -1,28 +1,46 @@
 import { connection } from "../db/migrate.js";
 
 export async function create(artistData) {
-  const { name, dob, gender, address, firstReleaseYear, noOfAlbumsReleased } =
-    artistData;
+  const {
+    name,
+    dob,
+    email,
+    gender,
+    address,
+    firstReleaseYear,
+    noOfAlbumsReleased,
+  } = artistData;
 
   const query = `
-      INSERT INTO artist (name, dob, gender, address, first_release_year, no_of_albums_released)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `;
+     INSERT INTO artist (name, dob, email, gender, address, first_release_year, no_of_albums_released)
+     VALUES (?, ?, ?, ?, ?, ?, ?)
+   `;
   return new Promise((resolve, reject) => {
     connection.query(
       query,
-      [name, dob, gender, address, firstReleaseYear, noOfAlbumsReleased],
+      [name, dob, email, gender, address, firstReleaseYear, noOfAlbumsReleased],
       (err, results) => {
         if (err) reject(err);
-        else resolve(results);
+        else resolve({ id: results.insertId });
       }
     );
   });
 }
 
+// get artist by email
+export async function getArtistByEmail(email) {
+  const query = `SELECT * FROM artist WHERE email = ?`;
+  return new Promise((resolve, reject) => {
+    connection.query(query, [email], (err, results) => {
+      if (err) reject(err);
+      else resolve(results[0]);
+    });
+  });
+}
+
 // Get All Artists
 export async function getAll(page, size) {
-  const query = `SELECT id, name, dob, gender, address, first_release_year, no_of_albums_released FROM artist`;
+  const query = `SELECT id, name, email, dob, gender, address, first_release_year, no_of_albums_released FROM artist`;
 
   const countQuery = `SELECT COUNT(*) AS total FROM artist`;
 
@@ -36,6 +54,7 @@ export async function getAll(page, size) {
         const data = results.map((artist) => ({
           id: artist.id,
           name: artist.name,
+          email: artist.email,
           dob: artist.dob,
           gender: artist.gender,
           address: artist.address,
@@ -55,36 +74,35 @@ export async function get(artistId) {
   return new Promise((resolve, reject) => {
     connection.query(query, [artistId], (err, results) => {
       if (err) reject(err);
-      const data = results.map((artist) => ({
-        id: artist.id,
-        name: artist.name,
-        dob: artist.dob,
-        gender: artist.gender,
-        address: artist.address,
-        firstReleaseYear: artist.first_release_year,
-        noOfAlbumsReleased: artist.no_of_albums_released,
-      }));
-      resolve(data[0]);
+      else resolve(results[0]);
     });
   });
 }
 
 // Update Artist
 export async function update(artistId, artistData) {
-  const { name, dob, gender, address, firstReleaseYear, noOfAlbumsReleased } =
-    artistData;
+  const {
+    name,
+    dob,
+    email,
+    gender,
+    address,
+    firstReleaseYear,
+    noOfAlbumsReleased,
+  } = artistData;
 
   const query = `
-      UPDATE artist
-      SET name = ?, dob = ?, gender = ?, address = ?, first_release_year = ?, no_of_albums_released = ?
-      WHERE id = ?
-    `;
+     UPDATE artist
+     SET name = ?, dob = ?, email = ?, gender = ?, address = ?, first_release_year = ?, no_of_albums_released = ?
+     WHERE id = ?
+   `;
   return new Promise((resolve, reject) => {
     connection.query(
       query,
       [
         name,
         dob,
+        email,
         gender,
         address,
         firstReleaseYear,

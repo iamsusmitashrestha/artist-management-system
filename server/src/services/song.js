@@ -1,11 +1,14 @@
 import { songSchema } from "../schema/song.js";
 import * as songModel from "../models/song.js";
 import { getMeta } from "../utils/pagination.js";
+import { AppError } from "../utils/errorHandler.js";
 
 // Create Song
 export async function createSong(songData) {
   const { error } = songSchema.validate(songData);
-  if (error) throw new Error(error.details[0].message);
+  if (error) {
+    throw new AppError(error.details[0].message, 400);
+  }
 
   return songModel.create(songData);
 }
@@ -27,7 +30,9 @@ export async function getAllSongs(artistId, page, size) {
 // Update Song
 export async function updateSong(songId, songData) {
   const { error } = songSchema.validate(songData);
-  if (error) throw new Error(error.details[0].message);
+  if (error) {
+    throw new AppError(error.details[0].message, 400);
+  }
 
   await songModel.update(songId, songData);
 

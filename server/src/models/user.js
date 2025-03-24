@@ -16,13 +16,25 @@ export async function create(userData) {
     gender,
     address,
     role,
+    artistId,
   } = userData;
-  const query = `INSERT INTO user (first_name, last_name, email, password, phone, dob, gender, address, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const query = `INSERT INTO user (first_name, last_name, email, password, phone, dob, gender, address, role, artist_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ? ,?)`;
 
   return new Promise((resolve, reject) => {
     connection.query(
       query,
-      [firstName, lastName, email, password, phone, dob, gender, address, role],
+      [
+        firstName,
+        lastName,
+        email,
+        password,
+        phone,
+        dob,
+        gender,
+        address,
+        role,
+        artistId,
+      ],
       (err, results) => {
         if (err) reject(err);
         else resolve(results);
@@ -69,6 +81,7 @@ export async function getAllUsers(page, size) {
           gender: user.gender,
           address: user.address,
           role: user.role,
+          artistId: user.artist_id,
         }));
 
         resolve({ data, count });
@@ -81,7 +94,7 @@ export async function getAllUsers(page, size) {
  * Get user by ID
  */
 export async function getUserById(userId) {
-  const query = `SELECT id, first_name, last_name, email, phone, dob, gender, address, role FROM user WHERE id = ?`;
+  const query = `SELECT id, first_name, last_name, email, phone, dob, gender, address, role, artist_id FROM user WHERE id = ?`;
 
   return new Promise((resolve, reject) => {
     connection.query(query, [userId], (err, results) => {
@@ -96,6 +109,7 @@ export async function getUserById(userId) {
         gender: user.gender,
         address: user.address,
         role: user.role,
+        artistId: user.artist_id,
       }));
       resolve(data[0]);
     });

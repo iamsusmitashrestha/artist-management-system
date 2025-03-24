@@ -6,6 +6,7 @@
     <title>Document</title>
     <link rel="stylesheet" href="./../../css/dashboard.css" />
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <link rel="stylesheet" href="./../../css/style.css" />
   </head>
   <body>
@@ -16,13 +17,12 @@
       <div class="tabBtns">
         <button class="tab" data-tab-target="#users-tab">Users</button>
         <button class="tab" data-tab-target="#artists-tab">Artists</button>
-        <button class="tab" data-tab-target="#songs-tab">Songs</button>
       </div>
 
       <div class="tabContent">
         <div class="tabPanel" id="users-tab">
           <button id="createBtn">Create</button>
-          <div id="userModal" class="modal">
+          <div id="userModal" class="modal" style="display: none">
             <div class="modal-content">
               <span class="close">&times;</span>
               <h2>Create / Update User</h2>
@@ -89,6 +89,7 @@
                       alt="Show Password"
                     />
                   </div>
+                  <small class="error-message"></small>
                 </div>
 
                 <div class="input-group full-width">
@@ -116,7 +117,7 @@
         <div class="tabPanel" id="artists-tab">
           <button id="createArtistBtn">Create</button>
           <!-- Artist Modal -->
-          <div id="artistModal" class="modal">
+          <div id="artistModal" class="modal" style="display: none">
             <div class="modal-content">
               <span class="closeArtist">&times;</span>
               <h2>Create / Update Artist</h2>

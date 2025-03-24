@@ -4,9 +4,6 @@
   "description": "",
   "type": "module",
   "main": "index.js",
-  "scripts": {
-    "dev": "nodemon src/app/pages/user/register.js"
-  },
   "author": "",
   "license": "ISC",
   "dependencies": {

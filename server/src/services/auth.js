@@ -3,6 +3,9 @@ import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import { create, getUserByEmail } from "../models/user.js";
 import { loginSchema, userSchema } from "../schema/user.js";
+import { AppError } from "../utils/errorHandler.js";
+import { createArtist } from "./artist.js";
+import { ROLES } from "../constants/common.js";
 
 dotenv.config();
 
@@ -13,8 +16,8 @@ const JWT_SECRET = process.env.JWT_SECRET || "jwt_secret";
  * @param {Object} userData - User details.
  * @returns {Promise}
  */
-export async function createUser(userData) {
-  const { password, email, role } = userData;
+export async function createUser(userData, skipArtist = false) {
+  const { password, email } = userData;
 
   const existingUser = await getUserByEmail(email);
 
@@ -23,14 +26,35 @@ export async function createUser(userData) {
   }
 
   const { error } = userSchema.validate(userData);
-  if (error) throw new Error(error.details[0].message);
+  if (error) throw new AppError(error.details[0].message, 400);
 
-  // Hash password before saving
+  // Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  if (role === "artist") {
+  if (!skipArtist && userData.role === ROLES.ARTIST) {
+    const artistData = {
+      name: userData.firstName + " " + userData.lastName,
+      dob: userData.dob,
+      email: userData.email,
+      gender: userData.gender,
+      address: userData.address,
+      firstReleaseYear: new Date().getFullYear(),
+      noOfAlbumsReleased: 0,
+    };
+
+    const artist = await createArtist(artistData);
+
+    return create({
+      ...userData,
+      password: hashedPassword,
+      artistId: artist.id,
+    });
   }
-  return create({ ...userData, password: hashedPassword });
+
+  return create({
+    ...userData,
+    password: hashedPassword,
+  });
 }
 
 export async function login(userData) {
@@ -38,18 +62,29 @@ export async function login(userData) {
 
   // Validate
   const { error } = loginSchema.validate(userData);
-  if (error) throw new Error(error.details[0].message);
+  if (error) throw new AppError(error.details[0].message, 400);
 
   const user = await getUserByEmail(email);
 
+  if (!user) {
+    throw new AppError("Invalid email or password", 401);
+  }
+
   // Compare password
   const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) throw new Error("Invalid email or password");
+  if (!isMatch) {
+    throw new AppError("Invalid email or password", 401);
+  }
 
   // Generate JWT
   const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, {
     expiresIn: "12h",
   });
 
-  return { message: "Login successful", token, role: user.role, id: user.id };
+  return {
+    message: "Login successful",
+    token,
+    role: user.role,
+    artistId: user.artist_id,
+  };
 }

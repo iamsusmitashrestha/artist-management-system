@@ -1,5 +1,10 @@
-import { showToast } from "./toast.js";
-import { clearError, showError } from "../utils/common.js";
+import {
+  clearError,
+  handleError,
+  showError,
+  showToast,
+} from "../utils/common.js";
+
 import { API_BASE_URL, RESPONSE_TYPE } from "../constants/common.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -19,6 +24,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const dob = document.getElementById("dob");
     const address = document.getElementById("address");
     const gender = document.getElementById("gender");
+
+    // set default value for all fields in the form to avoid null values
+    // firstName.value = "John";
+    // lastName.value = "Doe";
+    // const number = Math.floor(Math.random() * 1000000000);
+    // email.value = "john.doe" + number + "@gmail.com";
+    // // email.value = "john.doe61054541@gmail.com";
+    // password.value = "Password1";
+    // phone.value = "1234567890";
+    // role.value = "artist";
+    // dob.value = "1990-01-01";
+    // address.value = "123, Main Street, City";
+    // gender.value = "M";
 
     if (firstName.value.trim() === "") {
       showError(firstName, "First name is required.");
@@ -72,16 +90,14 @@ document.addEventListener("DOMContentLoaded", () => {
         `${API_BASE_URL}/auth/register`,
         userData
       );
+
+      showToast("Registration successful", RESPONSE_TYPE.SUCCESS);
+
       window.location.href = "login.html";
 
-      // if (response.status === statusCodes.CREATED) {
-      //   showToast("Registration successful!", RESPONSE_TYPE.SUCCESS);
-      //   // navigateTo("/login");
-      //   // form.reset();
-      // }
+      form.reset();
     } catch (error) {
-      console.log(error);
-      // showToast("Something went wrong");
+      handleError(error);
     }
   });
 });

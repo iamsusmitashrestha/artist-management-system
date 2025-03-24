@@ -3,6 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import { parseRequestBody } from "../utils/parse.js";
 import * as songService from "../services/song.js";
 import { buildPageParams } from "../utils/pagination.js";
+import { AppError, handleError } from "../utils/errorHandler.js";
 
 // Create a new Song
 export async function createSong(req, res) {
@@ -13,10 +14,7 @@ export async function createSong(req, res) {
     res.writeHead(StatusCodes.CREATED, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ message: "Song created successfully" }));
   } catch (error) {
-    res.writeHead(StatusCodes.BAD_REQUEST, {
-      "Content-Type": "application/json",
-    });
-    res.end(JSON.stringify({ error: error.message }));
+    handleError(res, error);
   }
 }
 
@@ -45,11 +43,7 @@ export async function updateSong(req, res, songId) {
     const existingSong = await songService.getSong(songId);
 
     if (!existingSong) {
-      res.writeHead(StatusCodes.NOT_FOUND, {
-        "Content-Type": "application/json",
-      });
-      res.end(JSON.stringify({ message: "Song not found" }));
-      return;
+      throw new AppError("Song not found", StatusCodes.NOT_FOUND);
     }
 
     const body = await parseRequestBody(req);
@@ -58,10 +52,7 @@ export async function updateSong(req, res, songId) {
     res.writeHead(StatusCodes.OK, { "Content-Type": "application/json" });
     res.end(JSON.stringify(song));
   } catch (error) {
-    res.writeHead(StatusCodes.BAD_REQUEST, {
-      "Content-Type": "application/json",
-    });
-    res.end(JSON.stringify({ error: error.message }));
+    handleError(res, error);
   }
 }
 
@@ -71,11 +62,7 @@ export async function deleteSong(req, res, songId) {
     const existingSong = await songService.getSong(songId);
 
     if (!existingSong) {
-      res.writeHead(StatusCodes.NOT_FOUND, {
-        "Content-Type": "application/json",
-      });
-      res.end(JSON.stringify({ message: "Song not found" }));
-      return;
+      throw new AppError("Song not found", StatusCodes.NOT_FOUND);
     }
 
     await songService.deleteSong(songId);
@@ -83,9 +70,6 @@ export async function deleteSong(req, res, songId) {
     res.writeHead(StatusCodes.OK, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ message: "Song deleted successfully" }));
   } catch (error) {
-    res.writeHead(StatusCodes.BAD_REQUEST, {
-      "Content-Type": "application/json",
-    });
-    res.end(JSON.stringify({ error: error.message }));
+    handleError(res, error);
   }
 }

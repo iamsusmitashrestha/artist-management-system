@@ -1,12 +1,51 @@
-export function showError(input, message) {
-  const errorMessage = input.nextElementSibling;
-  errorMessage.innerText = message;
-  errorMessage.style.display = "block";
-  valid = false;
+export function showError(inputElement, message) {
+  const errorMessage = inputElement
+    .closest(".input-group")
+    .querySelector(".error-message");
+  if (errorMessage) {
+    errorMessage.textContent = message;
+    errorMessage.style.display = "block";
+    inputElement.classList.add("error");
+  }
 }
 
-export function clearError(input) {
-  input.nextElementSibling.style.display = "none";
+export function clearError(inputElement) {
+  const errorMessage = inputElement.nextElementSibling;
+  errorMessage.textContent = "";
+  errorMessage.style.display = "none";
+  inputElement.classList.remove("error");
+}
+
+export function showToast(message, type) {
+  Toastify({
+    text: message,
+    duration: 3000,
+    gravity: "top",
+    position: "right",
+    backgroundColor: type === "success" ? "green" : "red",
+    stopOnFocus: true,
+    close: true,
+  }).showToast();
+}
+
+export function handleError(error, inputElement = null) {
+  if (error.response) {
+    const errorMessage =
+      error.response.data.message ||
+      error.response.data.error ||
+      "An error occurred.";
+
+    showToast(errorMessage, "error");
+
+    // If an input element is provided, show the error message for that field
+    if (inputElement) {
+      showError(inputElement, errorMessage);
+    }
+  } else if (error.request) {
+    showToast("No response from the server. Please try again later.", "error");
+  } else {
+    showToast(error.message || "An unexpected error occurred.", "error");
+  }
 }
 
 export function formatDOB(dateString) {

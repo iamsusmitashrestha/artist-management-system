@@ -1,4 +1,5 @@
-import { API_BASE_URL } from "../constants/common.js";
+import { API_BASE_URL, RESPONSE_TYPE, ROLES } from "../constants/common.js";
+import { handleError, showToast } from "../utils/common.js";
 
 const token = localStorage.getItem("authToken");
 const userRole = localStorage.getItem("userRole");
@@ -8,11 +9,28 @@ function getArtistIdFromURL() {
   return urlParams.get("artistId");
 }
 
+async function fetchArtist() {
+  const artistId = getArtistIdFromURL();
+  if (!artistId) {
+    showToast("Artist not found!", RESPONSE_TYPE.ERROR);
+    return;
+  }
+
+  try {
+    const { data } = await axios.get(`${API_BASE_URL}/artists/${artistId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    document.getElementById("artistNameHeader").textContent = data.name;
+  } catch (error) {
+    handleError(error);
+  }
+}
+
 // Function to fetch songs
 async function fetchSongs() {
   const artistId = getArtistIdFromURL();
   if (!artistId) {
-    alert("Artist ID not found!");
+    showToast("Artist ID not found!", RESPONSE_TYPE.ERROR);
     return;
   }
 
@@ -25,7 +43,7 @@ async function fetchSongs() {
     );
     renderSongsTable(response.data.data);
   } catch (error) {
-    console.error("Error fetching songs:", error);
+    handleError(error);
   }
 }
 
@@ -48,7 +66,6 @@ function renderSongsTable(songs) {
       <th>Title</th>
       <th>Album Name</th>
       <th>Genre</th>
-      <th>Actions</th>
     </tr>
   `;
   table.appendChild(thead);
@@ -57,17 +74,25 @@ function renderSongsTable(songs) {
 
   songs.forEach((song) => {
     const row = document.createElement("tr");
-    row.innerHTML = `
+    if (userRole === ROLES.ARTIST) {
+      row.innerHTML = `
       <td>${song.title}</td>
       <td>${song.albumName || "N/A"}</td>
       <td>${song.genre || "N/A"}</td>
       <td>
         <button class="edit-song" data-id="${song.id}" data-title="${
-      song.title
-    }" data-album="${song.albumName}" data-genre="${song.genre}">Edit</button>
+        song.title
+      }" data-album="${song.albumName}" data-genre="${song.genre}">Edit</button>
         <button class="delete-song" data-id="${song.id}">Delete</button>
       </td>
     `;
+    } else {
+      row.innerHTML = `
+      <td>${song.title}</td>
+      <td>${song.albumName || "N/A"}</td>
+      <td>${song.genre || "N/A"}</td>
+    `;
+    }
     tbody.appendChild(row);
   });
 
@@ -132,17 +157,17 @@ async function submitSong(event) {
       await axios.put(`${API_BASE_URL}/songs/${songId}`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      alert("Song updated successfully!");
+      showToast("Song updated successfully", RESPONSE_TYPE.SUCCESS);
     } else {
       await axios.post(`${API_BASE_URL}/songs`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      alert("Song created successfully!");
+      showToast("Song created successfully!", RESPONSE_TYPE.SUCCESS);
     }
     closeModal();
     fetchSongs();
   } catch (error) {
-    console.error("Error saving song:", error);
+    handleError(error);
   }
 }
 
@@ -156,19 +181,29 @@ async function deleteSong(event) {
     await axios.delete(`${API_BASE_URL}/songs/${songId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    alert("Song deleted successfully!");
+    showToast("Song deleted successfully!", RESPONSE_TYPE.SUCCESS);
     fetchSongs();
   } catch (error) {
-    console.error("Error deleting song:", error);
+    handleError(error);
   }
 }
 
 // Event listeners
 document.addEventListener("DOMContentLoaded", () => {
+  fetchArtist();
   fetchSongs();
 
-  if (userRole === "artist") {
+  const logoutBtn = document.getElementById("logout");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", function () {
+      localStorage.removeItem("authToken");
+      window.location.href = "login.html";
+    });
+  }
+
+  if (userRole === ROLES.ARTIST) {
     document.getElementById("createSongBtn").style.display = "block";
+    document.getElementById("logout").style.display = "block";
     document
       .getElementById("createSongBtn")
       .addEventListener("click", openCreateModal);

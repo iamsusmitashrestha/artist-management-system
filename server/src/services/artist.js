@@ -1,12 +1,40 @@
 import { artistSchema } from "../schema/artist.js";
 import * as artistModel from "../models/artist.js";
 import { getMeta } from "../utils/pagination.js";
+import { AppError } from "../utils/errorHandler.js";
 
 export async function createArtist(artistData) {
   const { error } = artistSchema.validate(artistData);
   if (error) throw new Error(error.details[0].message);
 
-  return artistModel.create(artistData);
+  const artist = await artistModel.create(artistData);
+  return artist;
+}
+
+export async function importArtists(artists) {
+  for (const artist of artists) {
+    const { error } = artistSchema.validate(artist);
+    if (error) {
+      throw new AppError(error.details[0].message, 400);
+    }
+
+    await artistModel.create(artist);
+  }
+}
+
+export async function validateArtist(artistData) {
+  const { error } = artistSchema.validate(artistData);
+  if (error) {
+    throw new AppError(error.details[0].message, 400);
+  }
+
+  // get artist by email
+  const artist = await artistModel.getArtistByEmail(artistData.email);
+  if (artist) {
+    throw new AppError("Artist with email already exists", 400);
+  }
+
+  return artistModel.validateArtist(artistData);
 }
 
 // Get Artist
@@ -26,7 +54,9 @@ export async function getAllArtists(page, size) {
 // Update Artist
 export async function updateArtist(artistId, artistData) {
   const { error } = artistSchema.validate(artistData);
-  if (error) throw new Error(error.details[0].message);
+  if (error) {
+    throw new AppError(error.details[0].message, 400);
+  }
 
   await artistModel.update(artistId, artistData);
 
@@ -36,13 +66,4 @@ export async function updateArtist(artistId, artistData) {
 // Delete Artist
 export async function deleteArtist(artistId) {
   return artistModel.deleteArtist(artistId);
-}
-
-export async function importArtists(artists) {
-  for (const artist of artists) {
-    const { error } = artistSchema.validate(artist);
-    if (error) throw new Error(error.details[0].message);
-
-    await artistModel.create(artist);
-  }
 }

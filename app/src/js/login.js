@@ -1,6 +1,5 @@
 import { API_BASE_URL, ROLES } from "../constants/common.js";
-import { showToast } from "./toast.js";
-// import statusCodes from "http-status-codes";
+import { handleError, showToast } from "../utils/common.js";
 
 document
   .getElementById("loginForm")
@@ -16,27 +15,21 @@ document
         password,
       });
 
-      // if (response.status === statusCodes.OK) {
-      //   console.log("ok");
-      //   showToast("Login successful", RESPONSE_TYPE.SUCCESS);
-      //   // form.reset();
-      // }
-
       if (response.data.token) {
         localStorage.setItem("authToken", response.data.token);
         localStorage.setItem("userRole", response.data.role);
 
         if (response.data.role === ROLES.ARTIST) {
-          window.location.href = `song.html?artistId=${response.data.id}`;
+          window.location.href = `song.html?artistId=${response.data.artistId}`;
         } else {
           window.location.href = "dashboard.html";
         }
+        showToast(response.data.message, RESPONSE_TYPE.SUCCESS);
       } else {
-        alert("Invalid credentials");
+        showToast(response.data.message, RESPONSE_TYPE.ERROR);
       }
     } catch (error) {
-      console.error(error);
-      alert("Login failed");
+      handleError(error);
     }
   });
 

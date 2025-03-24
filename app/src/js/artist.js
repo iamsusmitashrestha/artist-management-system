@@ -1,9 +1,15 @@
-import { API_BASE_URL } from "../constants/common.js";
-import { showToast } from "./toast.js";
+import { API_BASE_URL, ROLES } from "../constants/common.js";
+
+const userRole = localStorage.getItem("userRole");
 
 document.addEventListener("DOMContentLoaded", function () {
   const exportButton = document.getElementById("exportArtistsBtn");
   const importInput = document.getElementById("importArtistsInput");
+
+  if (userRole != ROLES.ARTIST_MANAGER) {
+    exportButton.style.display = "none";
+    importInput.style.display = "none";
+  }
 
   // Add event listeners for export and import buttons
   exportButton.addEventListener("click", exportArtistsToCSV);
@@ -18,12 +24,11 @@ document.addEventListener("DOMContentLoaded", function () {
         },
       });
 
-      console.log(data.data);
-
       const csvData = [
         [
           "Name",
           "Address",
+          "Email",
           "DOB",
           "Gender",
           "First Release Year",
@@ -32,6 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
         ...data.data.map((artist) => [
           artist.name,
           artist.address || "N/A",
+          artist.email || "N/A",
           artist.dob || "N/A",
           artist.gender || "N/A",
           artist.firstReleaseYear || "N/A",
@@ -73,11 +79,10 @@ document.addEventListener("DOMContentLoaded", function () {
         skipEmptyLines: true, // Skip empty rows
       });
 
-      console.log(JSON.stringify(parsedData));
-
       const artists = parsedData.data.map((row) => ({
         name: row["Name"].trim(),
         address: row["Address"].trim(),
+        email: row["Email"].trim(),
         dob: new Date(row["DOB"]).toISOString().split("T")[0],
         gender: row["Gender"].trim(),
         firstReleaseYear: parseInt(row["First Release Year"].trim(), 10),

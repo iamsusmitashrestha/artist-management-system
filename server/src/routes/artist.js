@@ -26,7 +26,7 @@ export function handleArtistRoutes(req, res) {
         }
       );
     } else if (req.method === METHOD.GET && /^\/artists\/\d+$/.test(req.url)) {
-      requireRole([ROLES.SUPER_ADMIN, ROLES.ARTIST_MANAGER])(
+      requireRole([ROLES.SUPER_ADMIN, ROLES.ARTIST_MANAGER, ROLES.ARTIST])(
         req,
         res,
         async () => {
