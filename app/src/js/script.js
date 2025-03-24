@@ -1,4 +1,4 @@
-import { ROLES } from "../constants/common";
+import { ROLES } from "../constants/common.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   const user = localStorage.getItem("authToken");

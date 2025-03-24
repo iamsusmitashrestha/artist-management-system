@@ -1,88 +1,37 @@
-import {
-  clearError,
-  handleError,
-  showError,
-  showToast,
-} from "../utils/common.js";
-
 import { API_BASE_URL, RESPONSE_TYPE } from "../constants/common.js";
+import { handleError, showToast } from "../utils/common.js";
+import { validateUserForm } from "./validation.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("registerForm");
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    let valid = true;
 
-    // Collect form data
-    const firstName = document.getElementById("firstName");
-    const lastName = document.getElementById("lastName");
-    const email = document.getElementById("email");
-    const password = document.getElementById("password");
-    const phone = document.getElementById("phone");
-    const role = document.getElementById("role");
-    const dob = document.getElementById("dob");
-    const address = document.getElementById("address");
-    const gender = document.getElementById("gender");
+    const fields = {
+      firstName: document.getElementById("firstName"),
+      lastName: document.getElementById("lastName"),
+      email: document.getElementById("email"),
+      password: document.getElementById("password"),
+      phone: document.getElementById("phone"),
+      role: document.getElementById("role"),
+      dob: document.getElementById("dob"),
+      address: document.getElementById("address"),
+      gender: document.getElementById("gender"),
+    };
 
-    // set default value for all fields in the form to avoid null values
-    // firstName.value = "John";
-    // lastName.value = "Doe";
-    // const number = Math.floor(Math.random() * 1000000000);
-    // email.value = "john.doe" + number + "@gmail.com";
-    // // email.value = "john.doe61054541@gmail.com";
-    // password.value = "Password1";
-    // phone.value = "1234567890";
-    // role.value = "artist";
-    // dob.value = "1990-01-01";
-    // address.value = "123, Main Street, City";
-    // gender.value = "M";
+    if (!validateUserForm(fields)) return;
 
-    if (firstName.value.trim() === "") {
-      showError(firstName, "First name is required.");
-      valid = false;
-    } else clearError(firstName);
-
-    if (lastName.value.trim() === "") {
-      showError(lastName, "Last name is required.");
-      valid = false;
-    } else clearError(lastName);
-
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailPattern.test(email.value)) {
-      showError(email, "Enter a valid email.");
-      valid = false;
-    } else clearError(email);
-
-    if (password.value.length < 6) {
-      showError(password, "Password must be at least 6 characters.");
-      valid = false;
-    } else clearError(password);
-
-    const phonePattern = /^[0-9]{10}$/;
-    if (!phonePattern.test(phone.value)) {
-      showError(phone, "Enter a valid 10-digit phone number.");
-      valid = false;
-    } else clearError(phone);
-
-    if (role.value === "") {
-      showError(role, "Please select a role.");
-      valid = false;
-    } else clearError(role);
-
-    if (!valid) return;
-
-    // Prepare request payload
     const userData = {
-      firstName: firstName.value,
-      lastName: lastName.value,
-      email: email.value,
-      password: password.value,
-      phone: phone.value,
-      role: role.value,
-      dob: dob.value,
-      address: address.value,
-      gender: gender.value,
+      firstName: fields.firstName.value,
+      lastName: fields.lastName.value,
+      email: fields.email.value,
+      password: fields.password.value,
+      phone: fields.phone.value,
+      role: fields.role.value,
+      dob: fields.dob.value,
+      address: fields.address.value,
+      gender: fields.gender.value,
     };
 
     try {
@@ -91,9 +40,10 @@ document.addEventListener("DOMContentLoaded", () => {
         userData
       );
 
-      showToast("Registration successful", RESPONSE_TYPE.SUCCESS);
-
-      window.location.href = "login.html";
+      showToast(response.data.message, RESPONSE_TYPE.SUCCESS);
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 1000);
 
       form.reset();
     } catch (error) {

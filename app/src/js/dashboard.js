@@ -5,18 +5,14 @@ import {
   RESPONSE_TYPE,
   ROLES,
 } from "../constants/common.js";
-import {
-  clearError,
-  formatDOB,
-  handleError,
-  showError,
-  showToast,
-} from "../utils/common.js";
+import { formatDOB, handleError, showToast } from "../utils/common.js";
+import { validateUserForm } from "./validation.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   const logoutBtn = document.getElementById("logoutBtn");
   const artistModalTitle = document.getElementById("artistModalTitle");
   const userModalTitle = document.getElementById("userModalTitle");
+  const password = document.querySelector(".password");
 
   if (logoutBtn) {
     logoutBtn.addEventListener("click", function () {
@@ -114,7 +110,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       pageNumberDisplays[type].textContent = page;
       prevButtons[type].disabled = currentPage[type] === 1;
-      nextButtons[type].disabled = data.data.length < DEFAULT_PAGE_SIZE;
+      nextButtons[type].disabled =
+        page * DEFAULT_PAGE_SIZE >= data.meta.total || data.data.length === 0;
     } catch (error) {
       handleError(error);
     }
@@ -271,6 +268,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document.addEventListener("click", function (event) {
     if (event.target && event.target.id === "editBtn") {
       userModalTitle.textContent = "Edit User";
+      password.style.display = "none";
       const userId = event.target.dataset.id;
       fetchUserDetails(userId);
     }
@@ -316,10 +314,9 @@ document.addEventListener("DOMContentLoaded", function () {
       dob.value = user.dob ? user.dob.split("T")[0] : "";
       gender.value = user.gender || "";
       address.value = user.address || "";
-      password.value = "";
       role.value = user.role || "";
       editingUserId = userId;
-      userModal.style.display = "block";
+      userModal.style.display = "flex";
     } catch (error) {
       handleError(error);
     }
@@ -339,65 +336,36 @@ document.addEventListener("DOMContentLoaded", function () {
 
   saveButton.addEventListener("click", async (event) => {
     event.preventDefault();
-    let valid = true;
 
     // Collect form data
-    const firstName = document.getElementById("firstName");
-    const lastName = document.getElementById("lastName");
-    const email = document.getElementById("email");
-    const password = document.getElementById("password");
-    const phone = document.getElementById("phone");
-    const role = document.getElementById("role");
-    const dob = document.getElementById("dob");
-    const address = document.getElementById("address");
-    const gender = document.getElementById("gender");
-
-    if (firstName.value.trim() === "") {
-      showError(firstName, "First name is required.");
-      valid = false;
-    } else clearError(firstName);
-
-    if (lastName.value.trim() === "") {
-      showError(lastName, "Last name is required.");
-      valid = false;
-    } else clearError(lastName);
-
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailPattern.test(email.value)) {
-      showError(email, "Enter a valid email.");
-      valid = false;
-    } else clearError(email);
-
-    if (password.value.length < 6) {
-      showError(password, "Password must be at least 6 characters.");
-      valid = false;
-    } else clearError(password);
-
-    const phonePattern = /^[0-9]{10}$/;
-    if (!phonePattern.test(phone.value)) {
-      showError(phone, "Enter a valid 10-digit phone number.");
-      valid = false;
-    } else clearError(phone);
-
-    if (role.value === "") {
-      showError(role, "Please select a role.");
-      valid = false;
-    } else clearError(role);
-
-    if (!valid) return;
-
-    // Prepare request payload
-    const userData = {
-      firstName: firstName.value,
-      lastName: lastName.value,
-      email: email.value,
-      password: password.value,
-      phone: phone.value,
-      role: role.value,
-      dob: dob.value,
-      address: address.value,
-      gender: gender.value,
+    const fields = {
+      firstName: document.getElementById("firstName"),
+      lastName: document.getElementById("lastName"),
+      email: document.getElementById("email"),
+      password: document.getElementById("password"),
+      phone: document.getElementById("phone"),
+      role: document.getElementById("role"),
+      dob: document.getElementById("dob"),
+      address: document.getElementById("address"),
+      gender: document.getElementById("gender"),
     };
+
+    if (!validateUserForm(fields, !!editingUserId)) return;
+
+    const userData = {
+      firstName: fields.firstName.value,
+      lastName: fields.lastName.value,
+      email: fields.email.value,
+      phone: fields.phone.value,
+      role: fields.role.value,
+      dob: fields.dob.value,
+      address: fields.address.value,
+      gender: fields.gender.value,
+    };
+
+    if (!editingUserId && fields.password.value) {
+      userData.password = fields.password.value;
+    }
 
     try {
       if (editingUserId) {
@@ -484,8 +452,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       const artist = response.data;
-
-      console.log(artist);
 
       artistName.value = artist.name || "";
       artistEmail.value = artist.email || "";

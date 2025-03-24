@@ -34,3 +34,10 @@ label {
     justify-content: flex-end; 
     margin: 24px;
   }
+
+  .error-message {
+    color: red;
+    font-size: 12px;
+    display: none;
+    /* Hidden by default */
+  }

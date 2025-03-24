@@ -6,6 +6,7 @@ import { loginSchema, userSchema } from "../schema/user.js";
 import { AppError } from "../utils/errorHandler.js";
 import { createArtist } from "./artist.js";
 import { ROLES } from "../constants/common.js";
+import { connection } from "../db/migrate.js";
 
 dotenv.config();
 
@@ -16,7 +17,8 @@ const JWT_SECRET = process.env.JWT_SECRET || "jwt_secret";
  * @param {Object} userData - User details.
  * @returns {Promise}
  */
-export async function createUser(userData, skipArtist = false) {
+export async function createUser(userData, skipArtist = false, trx) {
+  const conn = trx || connection;
   const { password, email } = userData;
 
   const existingUser = await getUserByEmail(email);
@@ -31,30 +33,43 @@ export async function createUser(userData, skipArtist = false) {
   // Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  if (!skipArtist && userData.role === ROLES.ARTIST) {
-    const artistData = {
-      name: userData.firstName + " " + userData.lastName,
-      dob: userData.dob,
-      email: userData.email,
-      gender: userData.gender,
-      address: userData.address,
-      firstReleaseYear: new Date().getFullYear(),
-      noOfAlbumsReleased: 0,
-    };
+  try {
+    connection.beginTransaction();
+    if (!skipArtist && userData.role === ROLES.ARTIST) {
+      const artistData = {
+        name: userData.firstName + " " + userData.lastName,
+        dob: userData.dob,
+        email: userData.email,
+        gender: userData.gender,
+        address: userData.address,
+        firstReleaseYear: new Date().getFullYear(),
+        noOfAlbumsReleased: 0,
+      };
 
-    const artist = await createArtist(artistData);
+      const artist = await createArtist(artistData, conn);
 
-    return create({
-      ...userData,
-      password: hashedPassword,
-      artistId: artist.id,
-    });
+      return create(
+        {
+          ...userData,
+          password: hashedPassword,
+          artistId: artist.id,
+        },
+        conn
+      );
+    }
+
+    await create(
+      {
+        ...userData,
+        password: hashedPassword,
+      },
+      conn
+    );
+    connection.commit();
+  } catch (error) {
+    connection.rollback();
+    throw new AppError(error.message, 500);
   }
-
-  return create({
-    ...userData,
-    password: hashedPassword,
-  });
 }
 
 export async function login(userData) {

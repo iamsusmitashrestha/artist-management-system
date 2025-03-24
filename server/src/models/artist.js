@@ -1,6 +1,7 @@
 import { connection } from "../db/migrate.js";
+import { injectPaginationToQuery } from "../utils/pagination.js";
 
-export async function create(artistData) {
+export async function create(artistData, trx) {
   const {
     name,
     dob,
@@ -16,7 +17,9 @@ export async function create(artistData) {
      VALUES (?, ?, ?, ?, ?, ?, ?)
    `;
   return new Promise((resolve, reject) => {
-    connection.query(
+    const conn = trx || connection;
+
+    conn.query(
       query,
       [name, dob, email, gender, address, firstReleaseYear, noOfAlbumsReleased],
       (err, results) => {
@@ -40,9 +43,11 @@ export async function getArtistByEmail(email) {
 
 // Get All Artists
 export async function getAll(page, size) {
-  const query = `SELECT id, name, email, dob, gender, address, first_release_year, no_of_albums_released FROM artist`;
+  let query = `SELECT id, name, email, dob, gender, address, first_release_year, no_of_albums_released FROM artist`;
 
   const countQuery = `SELECT COUNT(*) AS total FROM artist`;
+
+  query = injectPaginationToQuery(query, page, size);
 
   return new Promise((resolve, reject) => {
     connection.query(countQuery, [], (err, countResults) => {
@@ -128,10 +133,12 @@ export async function update(artistId, artistData) {
 }
 
 // Delete Artist
-export async function deleteArtist(artistId) {
+export async function deleteArtist(artistId, trx) {
   const query = `DELETE FROM artist WHERE id = ?`;
   return new Promise((resolve, reject) => {
-    connection.query(query, [artistId], (err, results) => {
+    const conn = trx || connection;
+
+    conn.query(query, [artistId], (err, results) => {
       if (err) reject(err);
       else resolve(results);
     });

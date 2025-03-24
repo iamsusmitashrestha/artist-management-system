@@ -6,28 +6,14 @@ import { buildPageParams } from "../utils/pagination.js";
 import { handleError } from "../utils/errorHandler.js";
 import { createUser } from "../services/auth.js";
 import { ROLES } from "../constants/common.js";
+import { connection } from "../db/migrate.js";
 
 export async function createArtist(req, res) {
   try {
     const body = await parseRequestBody(req);
     await artistService.validateArtist(body);
+
     const artist = await artistService.createArtist(body);
-
-    // create user with role artist
-    const userData = {
-      firstName: `${body.name}.split(" ")[0]`,
-      lastName: `${body.name}.split(" ")[1]`,
-      email: body.email,
-      password: body.password || "Password1",
-      phone: body.phone || "9856345627",
-      dob: body.dob,
-      gender: body.gender,
-      address: body.address,
-      role: ROLES.ARTIST,
-      artistId: artist.id,
-    };
-
-    await createUser(userData, true);
     res.writeHead(StatusCodes.CREATED, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ message: "Artist created successfully" }));
   } catch (error) {

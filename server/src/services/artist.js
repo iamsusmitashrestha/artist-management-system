@@ -4,12 +4,44 @@ import { getMeta } from "../utils/pagination.js";
 import { AppError } from "../utils/errorHandler.js";
 import { deleteSongByArtistId } from "../models/song.js";
 import { deleteUserByArtistId } from "../models/user.js";
+import { connection } from "../db/migrate.js";
+import { createUser } from "./auth.js";
+import { ROLES } from "../constants/common.js";
 
-export async function createArtist(artistData) {
+export async function createArtist(artistData, trx) {
   const { error } = artistSchema.validate(artistData);
   if (error) throw new Error(error.details[0].message);
 
-  const artist = await artistModel.create(artistData);
+  const conn = trx || connection;
+
+  try {
+    connection.beginTransaction();
+
+    const artist = await artistModel.create(artistData, conn);
+
+    // create user with role artist
+    const userData = {
+      firstName: artistData.name.split(" ")[0],
+      lastName: artistData.name.split(" ")[1],
+      email: artistData.email,
+      password: artistData.password || "Password1",
+      phone: artistData.phone || "9856345627",
+      dob: artistData.dob,
+      gender: artistData.gender,
+      address: artistData.address,
+      role: ROLES.ARTIST,
+      artistId: artist.id,
+    };
+    createUser(userData, true, conn);
+
+    connection.commit();
+
+    return artist;
+  } catch (error) {
+    connection.rollback();
+    throw new AppError(error.message, 500);
+  }
+
   return artist;
 }
 
@@ -65,9 +97,18 @@ export async function updateArtist(artistId, artistData) {
 
 // Delete Artist
 export async function deleteArtist(artistId) {
-  await artistModel.deleteArtist(artistId);
+  connection.beginTransaction();
 
-  await deleteSongByArtistId(artistId);
+  try {
+    await deleteUserByArtistId(artistId, connection);
 
-  return deleteUserByArtistId(artistId);
+    await artistModel.deleteArtist(artistId, connection);
+
+    await deleteSongByArtistId(artistId, connection);
+
+    connection.commit();
+  } catch (error) {
+    connection.rollback();
+    throw new AppError(error.message, 500);
+  }
 }

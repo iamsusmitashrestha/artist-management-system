@@ -5,7 +5,7 @@ import { injectPaginationToQuery } from "../utils/pagination.js";
  * Inserts a new user into the database
  * @param {Object} userData - User details
  */
-export async function create(userData) {
+export async function create(userData, trx) {
   const {
     firstName,
     lastName,
@@ -21,7 +21,9 @@ export async function create(userData) {
   const query = `INSERT INTO user (first_name, last_name, email, password, phone, dob, gender, address, role, artist_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ? ,?)`;
 
   return new Promise((resolve, reject) => {
-    connection.query(
+    const conn = trx || connection;
+
+    conn.query(
       query,
       [
         firstName,
@@ -139,11 +141,13 @@ export async function updateUser(userId, updatedData) {
 /**
  * Delete user by ID
  */
-export async function deleteUser(userId) {
+export async function deleteUser(userId, trx) {
   const query = `DELETE FROM user WHERE id = ?`;
 
   return new Promise((resolve, reject) => {
-    connection.query(query, [userId], (err, results) => {
+    const conn = trx || connection;
+
+    conn.query(query, [userId], (err, results) => {
       if (err) return reject(err);
       resolve("User deleted successfully");
     });
@@ -151,10 +155,12 @@ export async function deleteUser(userId) {
 }
 
 //Delete user by artistId
-export async function deleteUserByArtistId(artistId) {
+export async function deleteUserByArtistId(artistId, trx) {
   const query = `DELETE FROM user WHERE artist_id = ?`;
   return new Promise((resolve, reject) => {
-    connection.query(query, [artistId], (err, results) => {
+    const conn = trx || connection;
+
+    conn.query(query, [artistId], (err, results) => {
       if (err) reject(err);
       else resolve(results);
     });

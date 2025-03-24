@@ -4,6 +4,7 @@ import { updateUserSchema } from "../schema/user.js";
 import { AppError } from "../utils/errorHandler.js";
 import { deleteArtist } from "../models/artist.js";
 import { deleteSongByArtistId } from "../models/song.js";
+import { connection } from "../db/migrate.js";
 
 export async function getAllUsers(page, size) {
   const { data, count } = await userModel.getAllUsers(page, size);
@@ -43,11 +44,26 @@ export async function updateUser(userId, updatedData) {
  * Delete user by ID
  */
 export async function deleteUser(userId) {
-  const user = await userModel.deleteUser(userId);
+  const existingUser = await userModel.getUserById(userId);
 
-  console.log(user);
+  if (!existingUser) {
+    throw new AppError("Artist not found", 500);
+  }
 
-  await deleteArtist(user.artistId);
+  connection.beginTransaction();
 
-  return deleteSongByArtistId(user.artistId);
+  try {
+    await userModel.deleteUser(userId, connection);
+
+    if (existingUser.artistId) {
+      await deleteArtist(existingUser.artistId, connection);
+
+      await deleteSongByArtistId(existingUser.artistId, connection);
+    }
+
+    connection.commit();
+  } catch (error) {
+    connection.rollback();
+    throw new AppError(error.message, 500);
+  }
 }

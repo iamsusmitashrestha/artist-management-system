@@ -98,10 +98,12 @@ export async function deleteSong(songId) {
 }
 
 //Delete song by artistId
-export async function deleteSongByArtistId(artistId) {
+export async function deleteSongByArtistId(artistId, trx) {
   const query = `DELETE FROM music WHERE artist_id = ?`;
   return new Promise((resolve, reject) => {
-    connection.query(query, [artistId], (err, results) => {
+    const conn = trx || connection;
+
+    conn.query(query, [artistId], (err, results) => {
       if (err) reject(err);
       else resolve(results);
     });
