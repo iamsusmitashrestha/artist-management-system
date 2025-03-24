@@ -12,10 +12,12 @@ import {
   showError,
   showToast,
 } from "../utils/common.js";
-// import { showToast } from "./toast.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   const logoutBtn = document.getElementById("logoutBtn");
+  const artistModalTitle = document.getElementById("artistModalTitle");
+  const userModalTitle = document.getElementById("userModalTitle");
+
   if (logoutBtn) {
     logoutBtn.addEventListener("click", function () {
       localStorage.removeItem("authToken");
@@ -268,6 +270,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.addEventListener("click", function (event) {
     if (event.target && event.target.id === "editBtn") {
+      userModalTitle.textContent = "Edit User";
       const userId = event.target.dataset.id;
       fetchUserDetails(userId);
     }
@@ -430,6 +433,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let editingArtistId = null;
 
   const artistName = document.getElementById("artistName");
+  const artistEmail = document.getElementById("artistEmail");
   const artistGender = document.getElementById("artistGender");
   const artistAddress = document.getElementById("artistAddress");
   const artistDOB = document.getElementById("artistDOB");
@@ -457,6 +461,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Clear Artist Form
   function clearArtistForm() {
     artistName.value = "";
+    artistEmail.value = "";
     artistGender.value = "";
     artistAddress.value = "";
     artistDOB.value = "";
@@ -466,8 +471,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.addEventListener("click", async function (event) {
     if (event.target && event.target.id === "editArtistBtn") {
+      artistModalTitle.textContent = "Edit Artist";
       const artistId = event.target.dataset.id;
-      console.log(artistId);
       await fetchArtistDetails(artistId);
     }
   });
@@ -480,7 +485,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const artist = response.data;
 
+      console.log(artist);
+
       artistName.value = artist.name || "";
+      artistEmail.value = artist.email || "";
+
       artistGender.value = artist.gender || "";
       artistAddress.value = artist.address || "";
       artistDOB.value = artist.dob ? artist.dob.split("T")[0] : "";
@@ -504,6 +513,7 @@ document.addEventListener("DOMContentLoaded", function () {
       gender: artistGender.value,
       address: artistAddress.value.trim(),
       dob: artistDOB.value,
+      email: artistEmail.value.trim(),
       firstReleaseYear: firstReleaseYear.value,
       noOfAlbumsReleased: albumsReleased.value,
     };
